@@ -44,5 +44,4 @@ always @(posedge clk_in)
       end
   end
 
-
 endmodule
