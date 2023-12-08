@@ -1,0 +1,75 @@
+`include "defines.v"
+module regfile(
+        input wire clk,
+        input wire rst,
+        input wire rdy,
+
+        //issue阶段
+        //from decoder
+        input  wire [5:0] rd,
+        input wire [5:0] rs1,
+        input wire [5:0] rs2,
+
+        //from rob
+        input wire [`ROBENTRY] rob_new_entry,
+        input wire issue_sgn,
+
+        //to rs
+        output wire [`ROBENTRY] Qj,
+        output wire [`ROBENTRY] Qk,
+        output wire [31:0] Vj,
+        output wire [31:0] Vk,
+
+        //commit阶段
+        //from rob
+        input wire[`ROBENTRY] rob_entry,  //指令编号
+        input wire [5:0] rob_des,   //rd对应地址
+        input wire[31:0] rob_result,
+        input wire commit_sgn
+    );
+    reg [31:0] value[31:0];
+    reg [`ROBENTRY] reorder[31:0];
+    reg busy [31:0];
+
+    assign Qj = rs1 ==`NULL ? `ENTRY_NULL : busy[rs1] ? reorder[rs1] : `ENTRY_NULL;
+    assign Qk = rs2 ==`NULL ? `ENTRY_NULL : busy[rs2] ? reorder[rs2] : `ENTRY_NULL;
+    assign Vj = rs1 ==`NULL ? 32'b0 : busy[rs1] ? 32'b0 : value[rs1];
+    assign Vk = rs2 ==`NULL ? 32'b0 : busy[rs2] ? 32'b0 : value[rs2];
+
+    integer i;
+    always @(posedge clk)begin
+        //清空
+        if(rst==`TRUE)begin 
+            for(i=0;i<32;i=i+1)begin
+                value[i] <= 0;
+                reorder[i] <= `ENTRY_NULL;
+                busy[i] <= `FALSE;                
+            end
+        end
+
+        else if(rdy==`FALSE)begin
+            //pause
+        end
+
+        //todo:predict if fail,we need to roll back
+
+        else begin
+            //issue 阶段
+            if(issue_sgn && rd!=`NULL && rd!=0)begin
+                busy[rd] <= `TRUE;
+                reorder[rd] <= rob_new_entry;
+            end
+
+            //commit 阶段
+            if(commit_sgn && rob_des!=`NULL && rob_des!=0) begin
+                value[rob_des]=rob_result;
+                if(reorder[rob_des]==rob_entry)begin
+                    busy[rob_des] <= `TRUE;
+                    reorder[rob_des] <= `ENTRY_NULL;
+                end
+            end
+        end
+    end
+
+
+endmodule

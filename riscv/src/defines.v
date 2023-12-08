@@ -14,6 +14,13 @@
 `define REGSIZE 31:0    //寄存器个数有32个
 `define REGINDEX 4:0    //总共有32个寄存器，因此寄存器下标0~31，用5位即可
 `define IMMLEN 31:0     //立即数的长度
+`define ROBENTRY 5:0
+`define NULL 6'd32
+`define ENTRY_NULL 6'd32
+
+`define EMPTY 3'b000
+`define WAITING 3'b001
+`define READY 3'b010  
 
 `define OPLEN 5:0//判断一个计算指令类型的长度
 `define OPCODE 6:0//是decoder中的opode所在的地方

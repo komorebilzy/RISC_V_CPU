@@ -5,11 +5,11 @@ module decoder(
     input wire [31:0] inst,
 
     output reg is_load_store,
-    output reg [4:0] rd,
-    output reg [4:0] rs1,
-    output reg [4:0] rs2,
+    output reg [5:0] rd,
+    output reg [5:0] rs1,
+    output reg [5:0] rs2,
     output reg [31:0] imm,
-    output reg op
+    output reg [5:0] op
 );
 
 wire [2:0] func3=inst[19:15]; //R I S B type
@@ -27,9 +27,9 @@ wire [31:0] immJ={{12{inst[31]}},inst[19:12],{inst[20]},inst[30:21],1'b0};
 always @(*) begin
     is_load_store = (opcode==`L_type)||(opcode==`S_type);
 
-    rd=inst[11:7];
-    rs1=inst[19:15];
-    rs2=inst[24:20];
+    rd={1'b0,inst[11:7]};
+    rs1={1'b0,inst[19:15]};
+    rs2={1'b0,inst[24:20]};
     imm=32'b0;
 
     case(opcode)
@@ -54,6 +54,7 @@ always @(*) begin
 
         `L_type:begin
             imm=immI;
+            rs2=`NULL;
             case(func3)
             3'b000: op=`LB;
             3'b001: op=`LH;
@@ -65,6 +66,7 @@ always @(*) begin
 
         `S_type:begin
             imm=immS;
+            rd=`NULL;
             case(func3)
                 3'b000: op=`SB;
                 3'b001: op=`SH;
@@ -74,6 +76,7 @@ always @(*) begin
 
         `B_type:begin
             imm=immB;
+            rd=`NULL;
             case(func3)
             3'b000: op=`BEQ;
             3'b001: op=`BNE;
@@ -86,6 +89,7 @@ always @(*) begin
 
         `I_type:begin
             imm=immI;
+            rs2=`NULL;
             case(func3)
             3'b000:op=`ADDI;
             3'b010:op=`SLTI;
@@ -103,21 +107,28 @@ always @(*) begin
         
         `Jal_type:begin
             imm=immJ;
+            rs1=`NULL;
+            rs2=`NULL;
             op=`JAL;
         end
 
         `Jalr_type:begin
             imm=immI;
+            rs2=`NULL;
             op=`JALR;
         end
 
         `Lui_type:begin 
             imm=immU;
+            rs1=`NULL;
+            rs2=`NULL;
             op=`LUI;
         end
 
         `Auipc_type:begin
             imm=immU;
+            rs1=`NULL;
+            rs2=`NULL;
             op=`AUIPC;
         end
     endcase
