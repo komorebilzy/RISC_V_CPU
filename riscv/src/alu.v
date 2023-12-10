@@ -8,16 +8,25 @@ module alu(
     //RS
     input wire RS_sgn,
     input wire [5:0] RS_opcode,
-    input wire [3:0] RS_ROB_name,
     input wire [31:0] RS_lhs,
     input wire [31:0] RS_rhs,
+    input wire [31:0] RS_imm,
+    input wire [31:0] RS_pc,
+    input wire [`ROBENTRY] RS_ROB_entry,
     
     //CDB
     output wire [3:0] CDB_ROB_name,
     output wire [31:0] CDB_result,
-    output wire CDB_sgn
+    output wire CDB_sgn,
 
     //LSB
+    input wire LSB_sgn,
+    input wire [5:0] LSB_opcode,
+    input wire [31:0] LSB_lhs,
+    input wire [31:0] LSB_rhs,
+    input wire [31:0] LSB_imm,
+    input wire [31:0] LSB_pc,
+    input wire [`ROBENTRY] RS_ROB_entry,
 
     //IF
 );
@@ -68,6 +77,8 @@ module alu(
 
             endcase
         end
+
+        else 
     end
 
 endmodule

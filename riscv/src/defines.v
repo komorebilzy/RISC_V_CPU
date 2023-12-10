@@ -21,6 +21,8 @@
 `define EMPTY 3'b000
 `define WAITING 3'b001
 `define READY 3'b010  
+`define LOAD_FINISHED 3'b011
+`define STORE_FINISHED 3'b100 
 
 `define OPLEN 5:0//判断一个计算指令类型的长度
 `define OPCODE 6:0//是decoder中的opode所在的地方

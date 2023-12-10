@@ -33,7 +33,7 @@ module rs(
     output reg [31:0] Vk_out,
     output reg [31:0] imm_out,
     output reg [31:0] pc_out,
-    output reg [31:0] inst_out,
+    // output reg [31:0] inst_out,
     output reg [`ROBENTRY] entry_out,
     
     //from CDB
@@ -46,14 +46,14 @@ module rs(
     input wire lsb_broadcast,
     input wire [31:0] lsb_result,
     input wire [`ROBENTRY] lsb_entry,
-
-//commit
+    
     //to rob by broadcast
     output wire rs_broadcast,
     output wire [`ROBENTRY] rs_entry_out,
     output wire [31:0] rs_result,
     output wire [31:0] rs_pc_out,
 
+//commit
     //from rob
     input wire rob_commit,
     input wire [`ROBENTRY] rob_entry,
@@ -103,7 +103,7 @@ module rs(
             Vk_out <= 0;
             imm_out <= 0;
             pc_out <= 0;
-            inst_out <= 0;
+            // inst_out <= 0;
             entry_out <= `ENTRY_NULL;    
         end
         else if(!rdy) begin
@@ -123,41 +123,6 @@ module rs(
                 Vj[cur_rs_empty] <= Vj_in;
                 Qk[cur_rs_empty] <= Qk_in;
                 Vk[cur_rs_empty] <= Vk_in;
-
-                // if(alu_broadcast && alu_entry==Qj_in)begin
-                //     Qj[cur_rs_empty] <= `ENTRY_NULL;
-                //     Vj[cur_rs_empty] <= alu_result;
-                // end
-                // else if(lsb_broadcast && lsb_entry==Qj_in)begin
-                //     Qj[cur_rs_empty] <= `ENTRY_NULL;
-                //     Vj[cur_rs_empty] <= lsb_result;
-                // end
-                // else if(rob_commit && rob_entry==Qj_in)begin
-                //     Qj[cur_rs_empty] <= `ENTRY_NULL;
-                //     Vj[cur_rs_empty] <= rob_result;
-                // end
-                // else begin
-                //     Qj[cur_rs_empty] <= Qj_in;
-                //     Vj[cur_rs_empty] <= Vj_in;
-                // end 
-                
-
-                // if(alu_broadcast && alu_entry==Qk_in)begin
-                //     Qk[cur_rs_empty] <= `ENTRY_NULL;
-                //     Vk[cur_rs_empty] <= alu_result;
-                // end
-                // else if(lsb_broadcast && lsb_entry==Qk_in)begin
-                //     Qk[cur_rs_empty] <= `ENTRY_NULL;
-                //     Vk[cur_rs_empty] <= lsb_result;
-                // end
-                // else if(rob_commit && rob_entry==Qk_in)begin
-                //     Qk[cur_rs_empty] <= `ENTRY_NULL;
-                //     Vk[cur_rs_empty] <= rob_result;
-                // end
-                // else begin
-                //     Qk[cur_rs_empty] <= Qk_in;
-                //     Vk[cur_rs_empty] <= Vk_in;
-                // end 
             end
 
             //update the state to ready
@@ -204,7 +169,7 @@ module rs(
                 Vk_out   <= Vk       [cur_rs_ready];
                 imm_out  <= imm      [cur_rs_ready];
                 pc_out   <= rs_pc    [cur_rs_ready];
-                inst_out <= inst     [cur_rs_ready];
+                // inst_out <= inst     [cur_rs_ready];
                 entry_out <= entry   [cur_rs_ready];
                 state[cur_rs_ready] <= `EMPTY;
             end
