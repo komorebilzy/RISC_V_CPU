@@ -30,11 +30,6 @@ module lsb(
     input wire [`ROBENTRY] alu_entry,
     input wire [31:0] alu_result,
     input wire [31:0] alu_pc_out,
-
-    //todo from rs
-    input wire rs_broadcast,
-    input wire [31:0] rs_result,
-    input wire [`ROBENTRY] rs_entry,
     
     //to rob by broadcast
     output reg lsb_load_broadcast,
@@ -68,6 +63,7 @@ module lsb(
 
     //LSB必须顺序访问，否则访问内存可能会出错
     reg [5:0] head,tail;
+    reg [5:0] next_head,next_tail;
     wire empty,full;
 
     assign next_head = (head+1) % LSB_SIZE;
@@ -178,6 +174,8 @@ module lsb(
 
             `STORE_FINISHED: begin
                 if(mem_valid) begin
+                    lsb_store_broadcast <= `TRUE;
+                    store_entry_out <= entry[next_head];
                     state[next_head] <= `EMPTY;
                     head <= next_head;
                 end

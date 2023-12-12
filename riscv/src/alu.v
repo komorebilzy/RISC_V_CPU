@@ -19,14 +19,14 @@ module alu(
     output wire [31:0] CDB_result,
     output wire CDB_sgn,
 
-    //LSB
-    input wire LSB_sgn,
-    input wire [5:0] LSB_opcode,
-    input wire [31:0] LSB_lhs,
-    input wire [31:0] LSB_rhs,
-    input wire [31:0] LSB_imm,
-    input wire [31:0] LSB_pc,
-    input wire [`ROBENTRY] RS_ROB_entry,
+    //LSB不需要再经过alu 地址计算直接在本地即可
+    // input wire LSB_sgn,
+    // input wire [5:0] LSB_opcode,
+    // input wire [31:0] LSB_lhs,
+    // input wire [31:0] LSB_rhs,
+    // input wire [31:0] LSB_imm,
+    // input wire [31:0] LSB_pc,
+    // input wire [`ROBENTRY] RS_ROB_entry,
 
     //IF
 );

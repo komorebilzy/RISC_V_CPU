@@ -8,7 +8,6 @@ module rs(
     input wire get_instruction,
     input wire [31:0] pc_now_in,
     input wire [`ROBENTRY] entry_in,
-    input wire [31:0] inst_in,
     output wire rs_full,
 
     input wire rollback, //predict is wrong
@@ -68,7 +67,6 @@ module rs(
     reg [`ROBENTRY] Qk [RS_SIZE-1:0];
     reg [`ROBENTRY] entry [RS_SIZE-1:0];
     reg [31:0] imm [RS_SIZE-1:0];
-    reg [31:0] inst [RS_SIZE-1:0];
     reg [31:0] rs_pc [RS_SIZE-1:0];
 
     //记录当前state
@@ -94,7 +92,6 @@ module rs(
                 Qk[i] <= `ENTRY_NULL;
                 entry[i] <= `ENTRY_NULL;
                 imm[i] <= 0;
-                inst[i] <= 0;
                 rs_pc[i] <= 0;
             end
             calculate_sgn <= 0;
@@ -116,7 +113,6 @@ module rs(
                 op[cur_rs_empty] <= op_in;
                 entry[cur_rs_empty] <= entry_in;
                 imm[cur_rs_empty] <= imm_in;
-                inst[cur_rs_empty] <= inst_in;
                 rs_pc[cur_rs_empty] <= pc_now_in;
 
                 Qj[cur_rs_empty] <= Qj_in;
