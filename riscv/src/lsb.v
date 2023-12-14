@@ -38,6 +38,8 @@ module lsb(
 
     output reg lsb_store_broadcast,
     output reg [`ROBENTRY] store_entry_out,
+    output reg [31:0] store_addr,
+    output reg [31:0] store_result,
 
 //commit
     //MEMCTRL
@@ -45,10 +47,10 @@ module lsb(
     input wire        mem_valid,
     input wire [31:0] mem_res,
     output reg        load_store_sgn,
-    output reg        load_or_store,
+    // output reg        load_or_store,
     output reg [4:0]  load_store_op,
-    output reg [31:0] load_store_addr,
-    output reg [31:0] load_store_data
+    output reg [31:0] load_store_addr
+    // output reg [31:0] load_store_data
 );
     parameter LSB_SIZE=32;
     reg [5:0] op [LSB_SIZE-1:0];
@@ -63,7 +65,7 @@ module lsb(
 
     //LSB必须顺序访问，否则访问内存可能会出错
     reg [5:0] head,tail;
-    reg [5:0] next_head,next_tail;
+    wire [5:0] next_head,next_tail;
     wire empty,full;
 
     assign next_head = (head+1) % LSB_SIZE;
@@ -90,14 +92,16 @@ module lsb(
             tail  <= 0;
             load_store_sgn <= 0;
             load_store_addr   <= 0;
-            load_store_data   <= 0;
-            load_or_store     <= 0;
+            // load_store_data   <= 0;
+            // load_or_store     <= 0;
             load_store_op     <= 0;
             lsb_load_broadcast<= 0;
             load_entry_out    <= 0;
             load_result       <= 0;
             lsb_store_broadcast<=0;
             store_entry_out   <= 0;
+            store_addr        <= 0;
+            store_result      <= 0;
         end
         else if(!rdy) begin
             //pause
@@ -153,10 +157,10 @@ module lsb(
             `WAITING: begin
                 if(Qj[next_head] == `ENTRY_NULL && Qk[next_head] == `ENTRY_NULL)begin
                     load_store_sgn <= 1;
-                    load_or_store <= op[next_head]>=`LB && op[next_head]<=`LHU; //1 means load ans 0 means store
+                    // load_or_store <= op[next_head]>=`LB && op[next_head]<=`LHU; //1 means load ans 0 means store
                     load_store_op <= op[next_head];
                     load_store_addr <= Vj[next_head] + imm[next_head];
-                    load_store_data <= Vk[next_head];
+                    // load_store_data <= Vk[next_head];
                     state[next_head] <= op[next_head]>=`LB && op[next_head]<=`LHU ? `LOAD_FINISHED : `STORE_FINISHED;
                 end
                     
@@ -176,6 +180,8 @@ module lsb(
                 if(mem_valid) begin
                     lsb_store_broadcast <= `TRUE;
                     store_entry_out <= entry[next_head];
+                    store_addr <= Vj[next_head] + imm[next_head];
+                    store_result <= Vk[next_head];
                     state[next_head] <= `EMPTY;
                     head <= next_head;
                 end
