@@ -17,6 +17,7 @@ module alu(
     //CDB
     output wire [3:0] CDB_ROB_name,
     output wire [31:0] result,
+    output wire [31:0] CDB_pc_init,
     output wire [31:0] CDB_pc,
     output wire CDB_sgn,
 
@@ -30,8 +31,9 @@ module alu(
 
     always @(*) begin
         if(RS_sgn)begin
-            CDB_pc <= 0;
-            CDB_result <= 0;
+            CDB_pc_init = pc;
+            CDB_pc = pc + 4;
+            CDB_result = 0;
             case(RS_opcode)
                 `ADD   : result = lhs + rhs;
                 `ADDI  : result = lhs + imm;
@@ -60,7 +62,6 @@ module alu(
                     end
                     else begin
                         result = 0;
-                        CDB_pc = pc + 4;
                     end
                 end
                 `BNE   : begin
@@ -70,7 +71,6 @@ module alu(
                     end
                     else begin
                         result = 0;
-                        CDB_pc = pc + 4;
                     end
                 end 
                 `BLT   : begin
@@ -80,7 +80,6 @@ module alu(
                     end
                     else begin
                         result = 0;
-                        CDB_pc = pc + 4;
                     end
                 end 
                 `BGE   : begin
@@ -90,7 +89,6 @@ module alu(
                     end
                     else begin
                         result = 0;
-                        CDB_pc = pc + 4;
                     end
                 end 
                 `BLTU  : begin
@@ -100,7 +98,6 @@ module alu(
                     end
                     else begin
                         result = 0;
-                        CDB_pc = pc + 4;
                     end
                 end 
                 `BGEU  : begin
@@ -110,7 +107,6 @@ module alu(
                     end
                     else begin
                         result = 0;
-                        CDB_pc = pc + 4;
                     end
                 end 
                 `JAL:begin

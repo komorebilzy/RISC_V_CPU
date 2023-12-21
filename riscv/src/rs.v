@@ -40,6 +40,7 @@ module rs(
     input wire [`ROBENTRY] alu_entry,
     input wire [31:0] alu_result,
     input wire [31:0] alu_pc_out,
+    input wire [31:0] alu_pc_init,
 
     //todo from lsb
     input wire lsb_broadcast,
@@ -51,6 +52,7 @@ module rs(
     output wire [`ROBENTRY] rs_entry_out,
     output wire [31:0] rs_result,
     output wire [31:0] rs_pc_out,
+    output wire [31:0] rs_pc_init,
 
 //commit
     //from rob
@@ -79,6 +81,7 @@ module rs(
     assign rs_entry_out=alu_entry;
     assign rs_result=alu_result;
     assign rs_pc_out=alu_pc_out;
+    assign rs_pc_init=alu_pc_init;
 
     integer i;
     always @(posedge clk)begin

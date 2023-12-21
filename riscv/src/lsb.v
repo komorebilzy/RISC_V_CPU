@@ -29,7 +29,6 @@ module lsb(
     input wire alu_broadcast,
     input wire [`ROBENTRY] alu_entry,
     input wire [31:0] alu_result,
-    input wire [31:0] alu_pc_out,
     
     //to rob by broadcast
     output reg lsb_load_broadcast,
@@ -40,6 +39,7 @@ module lsb(
     output reg [`ROBENTRY] store_entry_out,
     output reg [31:0] store_addr,
     output reg [31:0] store_result,
+    output wire [31:0] pc_out,
 
 //commit
     //MEMCTRL
@@ -49,8 +49,11 @@ module lsb(
     output reg        load_store_sgn,
     // output reg        load_or_store,
     output reg [4:0]  load_store_op,
-    output reg [31:0] load_store_addr
+    output reg [31:0] load_store_addr,
     // output reg [31:0] load_store_data
+
+    //from rob,只有当前面的store操作都执行完才能进行下一步的load操作
+    input wire finish_store
 );
     parameter LSB_SIZE=32;
     reg [5:0] op [LSB_SIZE-1:0];
@@ -60,7 +63,6 @@ module lsb(
     reg [`ROBENTRY] Qk [LSB_SIZE-1:0];
     reg [`ROBENTRY] entry [LSB_SIZE-1:0];
     reg [31:0] imm [LSB_SIZE-1:0];
-    reg [31:0] lsb_pc [LSB_SIZE-1:0];
     reg [2:0] state [LSB_SIZE-1:0]; 
 
     //LSB必须顺序访问，否则访问内存可能会出错
@@ -73,6 +75,7 @@ module lsb(
     assign empty = (head==tail);
     assign full=(next_head==tail);
     assign lsb_full=full;
+    assign pc_out = pc_now_in + 4;
 
     integer i;
     always @(posedge clk)begin
@@ -85,7 +88,6 @@ module lsb(
                 Qk[i] <= `ENTRY_NULL;
                 entry[i] <= `ENTRY_NULL;
                 imm[i] <= 0;
-                lsb_pc[i] <= 0;
                 state[i] <= `EMPTY;
             end
             head  <= 0;
@@ -112,7 +114,6 @@ module lsb(
                 op[next_tail] <= op_in;
                 entry[next_tail] <= entry_in;
                 imm[next_tail] <= imm_in;
-                lsb_pc[next_tail] <= pc_now_in;
 
                 Qj[next_tail] <= Qj_in;
                 Vj[next_tail] <= Vj_in;
@@ -177,7 +178,7 @@ module lsb(
             end
 
             `STORE_FINISHED: begin
-                if(mem_valid) begin
+                if(mem_valid && finish_store) begin
                     lsb_store_broadcast <= `TRUE;
                     store_entry_out <= entry[next_head];
                     store_addr <= Vj[next_head] + imm[next_head];

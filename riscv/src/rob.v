@@ -7,19 +7,20 @@ module rob(
 
     //issue
     input wire get_instruction,
-    input wire inst_in,
-    input wire value_in,
-    input wire op_in,
-    input wire rd_in,
-    input wire pc_in,
-    output reg [`ROBENTRY] entry_out,
-    output wire rob_full,
+    input wire [31:0]inst_in,
+    input wire [5:0]op_in,
+    input wire [5:0]rd_in,
+    input wire [31:0]pc_in,
+    output wire [`ROBENTRY] entry_out,
+    output wire rob_full,  
+    input wire rollback,
 
     //exe
     input wire rs_broadcast,
     input wire [`ROBENTRY] rs_entry_out,
     input wire [31:0] rs_result,
     input wire [31:0] rs_pc_out,
+    input wire [31:0] rs_pc_init,
 
     input wire lsb_load_broadcast,
     input wire [`ROBENTRY] load_entry_out,
@@ -28,6 +29,7 @@ module rob(
     input wire [`ROBENTRY] store_entry_out,
     input wire [31:0] store_addr,
     input wire [31:0] store_result,
+    input wire [31:0] lsb_pc_out,
 
     
     //commit 
@@ -36,14 +38,20 @@ module rob(
     output reg [4:0]  rob_store_op,
     output reg [31:0] rob_store_addr,
     output reg [31:0] rob_store_data,
+    //from mem
+    input wire finish_store,
 
-    //to regdfile
+    //to regfile
     output reg commit_sgn,
     output reg [`ROBENTRY] rob_entry,  //指令编号
     output reg [5:0] rob_des,   //rd对应地址
     output reg [31:0] rob_result,
 
-    input wire finish_store
+    //to ifetch
+    output reg is_branch_ins,
+    output reg update,
+    output reg [31:0] pc_update,
+    output reg [6:0] hash_idex_pc
 );
     parameter ROB_SIZE = 32;
     reg ready [ROB_SIZE-1:0];
@@ -53,22 +61,25 @@ module rob(
     reg [31:0] addr [ROB_SIZE-1:0];
     reg [5:0] op [ROB_SIZE-1:0];
     reg [5:0] rd [ROB_SIZE-1:0];
-    reg [31:0] pc [ROB_SIZE-1:0];
+    reg [31:0] pc_predict [ROB_SIZE-1:0];
+    reg [31:0] pc_real[ROB_SIZE-1:0];
+    reg [31:0] pc_init[ROB_SIZE-1:0];
     reg [5:0] head,tail;
     wire [5:0] next_head,next_tail;
     wire empty,full;
     reg is_storing;
 
     assign next_head = (head + 1) % ROB_SIZE;
-    assign next_tail = (tail + 1)% ROB_SIZE;
+    assign next_tail = (tail + 1) % ROB_SIZE;
     assign empty = (head==tail);
     assign full=(next_head==tail);
     assign rob_full=full;
+    assign entry_out = next_tail;
 
     integer i;
 
     always @(posedge clk) begin
-        if(clk || rob_full) begin
+        if(clk || rollback) begin
             for(i=0; i < ROB_SIZE; i=i+1) begin
                 ready[i] <= 0;
                 entry[i] <= `ENTRY_NULL;
@@ -77,11 +88,12 @@ module rob(
                 addr[i] <= 0;
                 op[i] <= 0;
                 rd[i] <= 0;
-                pc[i] <= 0;
+                pc_predict[i] <= 0;
+                pc_real[i] <=0;
+                pc_init[i] <= 0;
             end
             head <= 0;
             tail <= 0;
-            entry_out <= `ENTRY_NULL;
             rob_store_sgn <= `FALSE;
             rob_store_op <= 0;
             rob_store_addr <= 0;
@@ -91,6 +103,10 @@ module rob(
             rob_des <= 0;
             rob_result <= 0;
             is_storing <= `FALSE;
+            is_branch_ins <= `FALSE;
+            update <= `FALSE;
+            pc_update <= 0;
+            hash_idex_pc <=0;
         end
 
         else if(!rdy)begin
@@ -101,35 +117,45 @@ module rob(
                 ready[next_tail] <= `FALSE;
                 entry[next_tail] <= next_tail;
                 inst[next_tail] <= inst_in;
-                value[next_tail] <= value_in;
                 op[next_tail] <= op_in;
                 rd[next_tail] <= rd_in;
-                pc[next_tail] <= pc_in;
+                pc_predict[next_tail] <= pc_in;
                 tail <= next_tail;
             end
 
             if(!empty && ready[next_head] && !is_storing )begin
                 //here predictor
-                if(op[next_head]<`SB && op[next_head]>`SW)begin
-                    commit_sgn <=  `TRUE;
-                    rob_store_sgn <= `FALSE;
-                    rob_entry <= entry[next_head];
-                    rob_des <= rd[next_head];
-                    rob_result <= value[next_head];
-                    entry[next_head] <= `ENTRY_NULL;
-                    ready[next_head] <= `FALSE;
-                    head <= next_head;
-                end
+                if(pc_real[next_head] != pc_predict[next_head]) begin
+                    is_branch_ins <= `TRUE;
+                    update <= `TRUE;
+                    pc_update <= pc_real[next_head];
+                    hash_idex_pc <= pc_init[next_head][6:0];
+                end 
                 else begin
-                    rob_store_sgn <= `TRUE;
-                    commit_sgn <=  `FALSE;
-                    rob_store_op <= op[next_head];
-                    rob_store_addr <= value[next_head];
-                    rob_store_data <= addr[next_head];
-                    entry[next_head] <= `ENTRY_NULL;
-                    ready[next_head] <= `FALSE;
-                    is_storing <= `TRUE;
-                    
+                    if(op[next_head]>=`BEQ && op[next_head]<=`BGEU)begin
+                        is_branch_ins <= `TRUE;
+                        update <= `FALSE;
+                    end
+                    if(op[next_head]<`SB && op[next_head]>`SW)begin
+                        commit_sgn <=  `TRUE;
+                        rob_store_sgn <= `FALSE;
+                        rob_entry <= entry[next_head];
+                        rob_des <= rd[next_head];
+                        rob_result <= value[next_head];
+                        entry[next_head] <= `ENTRY_NULL;
+                        ready[next_head] <= `FALSE;
+                        head <= next_head;
+                    end
+                    else begin
+                        rob_store_sgn <= `TRUE;
+                        commit_sgn <=  `FALSE;
+                        rob_store_op <= op[next_head];
+                        rob_store_addr <= value[next_head];
+                        rob_store_data <= addr[next_head];
+                        entry[next_head] <= `ENTRY_NULL;
+                        ready[next_head] <= `FALSE;
+                        is_storing <= `TRUE;                    
+                    end
                 end
             end
             else begin
@@ -147,6 +173,7 @@ module rob(
                     if(entry[i]==load_entry_out)begin
                         ready[i] <= `TRUE;
                         value[i] <= load_result;
+                        pc_real[i] <= lsb_pc_out;
                     end
                 end
             end
@@ -157,6 +184,7 @@ module rob(
                         ready[i] <= `TRUE;
                         addr[i] <= store_addr;
                         value[i] <= store_result;
+                        pc_real[i] <= lsb_pc_out;
                     end
                 end
             end
@@ -166,7 +194,8 @@ module rob(
                     if(entry[i]==rs_entry_out)begin
                         ready[i] <= `TRUE;
                         value[i] <= rs_result;
-                        pc[i] <= rs_pc_out;
+                        pc_real[i] <= rs_pc_out;
+                        pc_init[i] <= rs_pc_init;
                     end
                 end
             end

@@ -10,7 +10,7 @@ module icache(
     input wire [511:0] MC_val,
     input wire MC_val_sgn,
     output wire [31:0]  Mc_addr,
-    output wire Mc_addr_sgn,
+    output wire Mc_addr_sgn, //true means really miss while false means no
 
     //Ifetch
     input wire [31:0] IF_addr,

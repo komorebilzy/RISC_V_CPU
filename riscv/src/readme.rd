@@ -1,3 +1,8 @@
+//todo:
+1.RS ROB LSB应该在ROB commit之后再次刷新V Q
+2/REGISTER FILE应该有先后顺序 先更新ROB传来的数据，再让ROB读取
+
+
 ifetch将取出来的指令传给rob
 
 rob为指令赋予一个编号entry

@@ -6,6 +6,7 @@ module regfile(
 
         //issue阶段
         //from decoder
+        input wire rollback,
         input  wire [5:0] rd,
         input wire [5:0] rs1,
         input wire [5:0] rs2,
@@ -39,7 +40,7 @@ module regfile(
     integer i;
     always @(posedge clk)begin
         //清空
-        if(rst==`TRUE)begin 
+        if(rst || rollback)begin 
             for(i=0;i<32;i=i+1)begin
                 value[i] <= 0;
                 reorder[i] <= `ENTRY_NULL;
@@ -50,8 +51,6 @@ module regfile(
         else if(rdy==`FALSE)begin
             //pause
         end
-
-        //todo:predict if fail,we need to roll back
 
         else begin
             //issue 阶段
