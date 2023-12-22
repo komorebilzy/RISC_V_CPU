@@ -16,7 +16,7 @@ module ifetch(
     output wire [31:0] IC_addr,
     output wire IC_addr_sgn,
 
-    input wire [5:0] entry_idel,
+    input wire [5:0] entry_idle,
 
     //for ROB
     output wire [31:0] pc_predict,
@@ -27,9 +27,6 @@ module ifetch(
     
     output wire rollback,
     
-    //from LSB
-    input wire LSB_full,
-
     output wire [5:0] entry_rob,
     output reg [31:0] pc,
     output wire [5:0] rd,
@@ -37,6 +34,7 @@ module ifetch(
     output wire [5:0] rs2,
     output wire [31:0] imm,
     output wire [5:0] op,
+    output reg issue_ins,
     output wire is_load_store
 );
 
@@ -49,7 +47,7 @@ assign rollback = update;
 assign pc_predict = pc_now;
 assign IC_addr = pc_now;
 assign IC_addr_sgn = stop_fetching;
-assign entry_rob = entry_idel;
+assign entry_rob = entry_idle;
 wire hash_idex_now =pc_now[6:0];
 
 decoder u_decoder(
@@ -70,12 +68,14 @@ always@(posedge clk)begin
         end
         pc_now <= 0;
         stop_fetching <= `FALSE;
+        issue_ins <= `FALSE;
     end
     else if(!rdy)begin
         //pause
     end
     else if(rollback)begin
         stop_fetching <= `FALSE;
+        issue_ins <= `FALSE;
         pc_now <= pc_update;
         if(predict_cnt[hash_idex_pc] != `stronglyTaken) predict_cnt[hash_idex_pc]<=predict_cnt[hash_idex_pc]+1;
     end
@@ -83,6 +83,7 @@ always@(posedge clk)begin
     else begin
         if(IC_ins_sgn)begin
             pc <= pc_now;
+            issue_ins <=  `TRUE;
             if(op==`JAL) pc_now <= pc_now+imm;
             else if(op==`JALR) stop_fetching <= `TRUE;
             else if(op>=`BEQ && op==`BGEU) begin

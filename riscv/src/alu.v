@@ -15,13 +15,11 @@ module alu(
     input wire [`ROBENTRY] ROB_entry,
     
     //CDB
-    output wire [3:0] CDB_ROB_name,
-    output wire [31:0] result,
-    output wire [31:0] CDB_pc_init,
-    output wire [31:0] CDB_pc,
-    output wire CDB_sgn,
-
-    //IF
+    output wire [5:0] CDB_ROB_name,
+    output reg [31:0] result,
+    output reg [31:0] CDB_pc_init,
+    output reg [31:0] CDB_pc,
+    output wire CDB_sgn
 );
    
     wire [4:0] shamt;
@@ -33,7 +31,7 @@ module alu(
         if(RS_sgn)begin
             CDB_pc_init = pc;
             CDB_pc = pc + 4;
-            CDB_result = 0;
+            result = 0;
             case(RS_opcode)
                 `ADD   : result = lhs + rhs;
                 `ADDI  : result = lhs + imm;

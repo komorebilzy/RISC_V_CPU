@@ -42,17 +42,21 @@ module lsb(
     output wire [31:0] pc_out,
 
 //commit
+    //from rob
+    input wire rob_commit,
+    input wire [`ROBENTRY] rob_entry,
+    input wire [31:0] rob_result,
+
     //MEMCTRL
-    //todo
     input wire        mem_valid,
     input wire [31:0] mem_res,
     output reg        load_store_sgn,
     // output reg        load_or_store,
-    output reg [4:0]  load_store_op,
+    output reg [5:0]  load_store_op,
     output reg [31:0] load_store_addr,
     // output reg [31:0] load_store_data
 
-    //from rob,只有当前面的store操作都执行完才能进行下一步的load操作
+    //from mem,只有当前面的store操作都执行完才能进行下一步的load操作
     input wire finish_store
 );
     parameter LSB_SIZE=32;
@@ -154,6 +158,21 @@ module lsb(
                 end
             end
 
+            if(rob_commit)begin
+                for(i = 0; i < LSB_SIZE; i = i + 1)begin
+                    if(state[i]==`WAITING) begin
+                        if(Qj[i]==rob_entry)begin
+                            Qj[i] <= `ENTRY_NULL;
+                            Vj[i] <= rob_result;
+                        end
+                        else if(Qk[i]==rob_entry)begin
+                            Qk[i] <= `ENTRY_NULL;
+                            Vk[i] <= rob_result;
+                        end
+                    end
+                end
+            end
+
             case(state[next_head])
             `WAITING: begin
                 if(Qj[next_head] == `ENTRY_NULL && Qk[next_head] == `ENTRY_NULL)begin
@@ -162,7 +181,7 @@ module lsb(
                     load_store_op <= op[next_head];
                     load_store_addr <= Vj[next_head] + imm[next_head];
                     // load_store_data <= Vk[next_head];
-                    state[next_head] <= op[next_head]>=`LB && op[next_head]<=`LHU ? `LOAD_FINISHED : `STORE_FINISHED;
+                    state[next_head] <= op[next_head]>=`LB && op[next_head]<=`LHU ? `LOAD_FINISHED : `STORE_PRE;
                 end
                     
             end
@@ -177,12 +196,16 @@ module lsb(
                 end
             end
 
-            `STORE_FINISHED: begin
-                if(mem_valid && finish_store) begin
-                    lsb_store_broadcast <= `TRUE;
-                    store_entry_out <= entry[next_head];
-                    store_addr <= Vj[next_head] + imm[next_head];
-                    store_result <= Vk[next_head];
+            `STORE_PRE: begin
+                state[next_head] <= `IS_STORING;
+                lsb_store_broadcast <= `TRUE;
+                store_entry_out <= entry[next_head];
+                store_addr <= Vj[next_head] + imm[next_head];
+                store_result <= Vk[next_head];
+            end
+
+            `IS_STORING :begin
+                if(finish_store)begin
                     state[next_head] <= `EMPTY;
                     head <= next_head;
                 end

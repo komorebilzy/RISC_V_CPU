@@ -14,13 +14,13 @@ module memory_control(
     //store form ROB
     input wire [31:0] store_data_in,
     input wire [31:0] store_addr_in,
-    input wire [4:0] store_op,
+    input wire [5:0] store_op,
     input wire store_sgn,
     output reg finish_store,
 
     //load from LSB
     input wire [31:0] load_addr,
-    input wire [4:0] load_op,
+    input wire [5:0] load_op,
     input wire load_sgn,
     output reg finish_load,
     output reg [31:0] load_data,

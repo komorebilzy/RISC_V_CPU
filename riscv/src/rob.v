@@ -7,10 +7,9 @@ module rob(
 
     //issue
     input wire get_instruction,
-    input wire [31:0]inst_in,
     input wire [5:0]op_in,
     input wire [5:0]rd_in,
-    input wire [31:0]pc_in,
+    input wire [31:0]pc_pred,
     output wire [`ROBENTRY] entry_out,
     output wire rob_full,  
     input wire rollback,
@@ -35,7 +34,7 @@ module rob(
     //commit 
     //to mem
     output reg  rob_store_sgn,
-    output reg [4:0]  rob_store_op,
+    output reg [5:0]  rob_store_op,
     output reg [31:0] rob_store_addr,
     output reg [31:0] rob_store_data,
     //from mem
@@ -56,7 +55,6 @@ module rob(
     parameter ROB_SIZE = 32;
     reg ready [ROB_SIZE-1:0];
     reg [`ROBENTRY] entry [ROB_SIZE-1:0];
-    reg [31:0] inst [ROB_SIZE-1:0];
     reg [31:0] value [ROB_SIZE-1:0];
     reg [31:0] addr [ROB_SIZE-1:0];
     reg [5:0] op [ROB_SIZE-1:0];
@@ -83,7 +81,6 @@ module rob(
             for(i=0; i < ROB_SIZE; i=i+1) begin
                 ready[i] <= 0;
                 entry[i] <= `ENTRY_NULL;
-                inst[i] <= 0;
                 value[i] <= 0;
                 addr[i] <= 0;
                 op[i] <= 0;
@@ -116,10 +113,9 @@ module rob(
             if(get_instruction)begin
                 ready[next_tail] <= `FALSE;
                 entry[next_tail] <= next_tail;
-                inst[next_tail] <= inst_in;
                 op[next_tail] <= op_in;
                 rd[next_tail] <= rd_in;
-                pc_predict[next_tail] <= pc_in;
+                pc_predict[next_tail] <= pc_pred;
                 tail <= next_tail;
             end
 
