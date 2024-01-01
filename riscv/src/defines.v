@@ -1,9 +1,6 @@
-`define ICSIZE 255:0  //ICache的大小
-`define ICSIZESCALAR 256
-`define BLOCKNUM 15:0   //ICACHE中BLOCK num
-`define ICINDEX 9:6   //inedx
-`define ICOFFSET 5:2
-`define ICTAG 31:10    //tag
+`define BLOCKNUM 255:0   //ICACHE中BLOCK num
+`define ICINDEX 10:2   //inedx
+`define ICTAG 17:11    //tag
 `define INSTRLEN 31:0  //instruction
 `define ADDR 31:0      //地址的长度为32位
 `define DATALEN 31:0   //data 最长情况下的数据为32位
@@ -15,8 +12,8 @@
 `define REGINDEX 4:0    //总共有32个寄存器，因此寄存器下标0~31，用5位即可
 `define IMMLEN 31:0     //立即数的长度
 `define ROBENTRY 5:0
-`define NULL 6'd32
-`define ENTRY_NULL 6'd32
+`define NULL 32
+`define ENTRY_NULL 32
 
 `define EMPTY 3'b000
 `define WAITING 3'b001
@@ -37,7 +34,7 @@
 `define R_type 7'b0110011
 `define S_type 7'b0100011
 `define B_type 7'b1100011
-`define I_type 7'b0100011
+`define I_type 7'b0010011
 `define L_type 7'b0000011
 `define Lui_type 7'b0110111
 `define Auipc_type 7'b0010111

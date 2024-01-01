@@ -1,11 +1,13 @@
 `include "defines.v"
-
+`ifndef rs
+`define rs
 module rs(
     input wire clk,
     input wire rst,
     input wire rdy,
 //issue
     input wire get_instruction,
+    input wire is_load_store,
     input wire [31:0] pc_now_in,
     input wire [`ROBENTRY] entry_in,
     output wire rs_full,
@@ -46,13 +48,6 @@ module rs(
     input wire lsb_broadcast,
     input wire [31:0] lsb_result,
     input wire [`ROBENTRY] lsb_entry,
-    
-    //to rob by broadcast
-    output wire rs_broadcast,
-    output wire [`ROBENTRY] rs_entry_out,
-    output wire [31:0] rs_result,
-    output wire [31:0] rs_pc_out,
-    output wire [31:0] rs_pc_init,
 
 //commit
     //from rob
@@ -76,13 +71,6 @@ module rs(
     reg [`ROBENTRY] cur_rs_ready;
 
     assign rs_full =  cur_rs_empty == `ENTRY_NULL;
-    //commit
-    assign rs_broadcast=alu_broadcast;
-    assign rs_entry_out=alu_entry;
-    assign rs_result=alu_result;
-    assign rs_pc_out=alu_pc_out;
-    assign rs_pc_init=alu_pc_init;
-
     integer i;
     always @(posedge clk)begin
         if(rst || rollback)begin
@@ -111,7 +99,7 @@ module rs(
         end
         else begin
             //issue
-            if(get_instruction)begin
+            if(get_instruction && !is_load_store)begin
                 state[cur_rs_empty] <= `WAITING;
                 op[cur_rs_empty] <= op_in;
                 entry[cur_rs_empty] <= entry_in;
@@ -197,7 +185,7 @@ module rs(
     integer j, k;
     always @(*)begin //随时改变,乱序执行 所以没必要按顺序找
         cur_rs_empty = `ENTRY_NULL;
-        for(j = 0; j < RS_SIZE; j = j + 1)begin
+        for(j = RS_SIZE-1 ; j >= 0; j = j - 1)begin
             if(state[j] == `EMPTY)begin
                 cur_rs_empty = j;
                 // break;  we cannot use break in if's body
@@ -205,7 +193,7 @@ module rs(
         end
 
         cur_rs_ready = `ENTRY_NULL;
-        for(k = 0; k < RS_SIZE; k = k + 1)begin
+        for(k = RS_SIZE -1 ; k  >= 0 ; k = k - 1)begin
             if(state[k] == `READY)begin
                 cur_rs_ready = k;
                 // break;
@@ -214,3 +202,4 @@ module rs(
     end
 
 endmodule
+`endif

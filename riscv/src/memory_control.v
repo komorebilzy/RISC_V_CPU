@@ -1,5 +1,7 @@
 `include "defines.v"
 //优先级顺序：store > load > fetch
+`ifndef mem_ctrl 
+`define mem_ctrl
 module memory_control(
     input wire clk,
     input wire rst,
@@ -9,13 +11,14 @@ module memory_control(
     input wire [31:0] pc_in,
     input wire pc_miss_sgn,
     output reg finish_ins,
-    output wire [511:0] ins_out,
+    output reg [31:0] ins_out,
 
     //store form ROB
     input wire [31:0] store_data_in,
     input wire [31:0] store_addr_in,
     input wire [5:0] store_op,
     input wire store_sgn,
+    output wire begin_real_store,
     output reg finish_store,
 
     //load from LSB
@@ -32,23 +35,17 @@ module memory_control(
     output reg mem_rw  //0 for read and 1 for write
 );
 
-reg [5:0] ins_offset;  //四次与ram交互得到一个指令，icache miss后需要读取一行（16条指令）
+reg [2:0] ins_offset;  //四次与ram交互得到一个指令，icache miss后需要读取一行（16条指令）
 reg [1:0] store_offset;
-reg [1:0] load_offset;
+reg [2:0] load_offset;
 reg [31:0] addr_record;
-reg [7:0] ins_buffer[63:0];
 
 reg is_idle;
 reg is_storing;
 reg is_loading;
 reg is_fetching;
 
-genvar i;
-generate 
-    for (i=0;i<64;i=i+1) begin
-        assign ins_out[(i*8+7):(i*8)] = ins_buffer[i];
-    end
-endgenerate
+assign begin_real_store= is_storing;
 
 always @(posedge clk) begin
     if(rst)begin
@@ -64,7 +61,7 @@ always @(posedge clk) begin
         finish_ins <=  `FALSE;
         finish_store <= `FALSE;
         finish_load <= `FALSE;
-        load_data <= `FALSE;
+        load_data <= 0;
 
         mem_dout <= 0;
         mem_addr <= 0;
@@ -74,6 +71,9 @@ always @(posedge clk) begin
     end
     else begin
         if (is_idle)begin
+            finish_ins <=  `FALSE;
+            finish_store <= `FALSE;
+            finish_load <= `FALSE;
             if(store_sgn)begin
                 is_storing <= `TRUE;
                 is_idle<=  `FALSE;
@@ -92,18 +92,18 @@ always @(posedge clk) begin
                 mem_addr <= load_addr;
                 mem_rw <= 0;
                 case(load_op)
-                    `LB || `LBU: begin   load_offset<= 2'b01;   end
-                    `LH || `LHU: begin   load_offset<= 2'b10;   end
-                    `LW: begin   load_offset<= 2'b11;   end
+                    `LB || `LBU: begin   load_offset<= 1;   end
+                    `LH || `LHU: begin   load_offset<= 2;   end
+                    `LW: begin   load_offset<= 4;   end
                 endcase        
             end
             else if(pc_miss_sgn)begin
                 is_fetching <= `TRUE;
                 is_idle <=  `FALSE;
                 ins_offset <= 0;
-                mem_addr <= {pc_in[31:6],6'b0};
+                mem_addr <= pc_in;
                 mem_rw <= 0;
-            end            
+            end 
         end
         else begin
             if(is_storing)begin
@@ -144,10 +144,10 @@ always @(posedge clk) begin
 
             else if(is_loading)begin
                 if(load_op==`LW)begin
-                    if(load_offset==2'b11) load_data[7:0] <= mem_din;
-                    else if(store_offset==2'b10) load_data[15:8] <= mem_din;       
-                    else if(store_offset==2'b01)  load_data[23:16] <= mem_din;  
-                    else begin
+                    if(load_offset==3) load_data[7:0] <= mem_din;
+                    else if(load_offset==2) load_data[15:8] <= mem_din;       
+                    else if(load_offset==1)  load_data[23:16] <= mem_din;  
+                    else if(load_offset==0) begin
                         load_data[31:24] <= mem_din;
                         is_loading <= `FALSE;
                         finish_load <=  `TRUE;
@@ -157,8 +157,8 @@ always @(posedge clk) begin
                     mem_addr <= mem_addr + 1;
                 end
                 else if(load_op==`LH || load_op== `LHU)begin
-                    if(load_offset==2'b10)  load_data[7:0] <= mem_din;
-                    else begin
+                    if(load_offset==1)  load_data[7:0] <= mem_din;
+                    else if(load_offset==0) begin
                         load_data[15:8] <= mem_din;
                         if(load_op==`LH) load_data[31:16]={16{load_data[15]}};
                         is_loading <= `FALSE;
@@ -178,15 +178,19 @@ always @(posedge clk) begin
                 end
             end
             else if(is_fetching)begin
-                ins_buffer[ins_offset] <= mem_din;
-                // ins_out[8*ins_offset+7:8*ins_offset] <= mem_din;
-                if(ins_offset==63)begin
+                if(ins_offset==1) ins_out[7:0] <= mem_din;
+                else if(ins_offset==2) ins_out[15:8] <=mem_din;
+                else if(ins_offset==3) ins_out[23:16] <=mem_din;
+                else if(ins_offset==4)begin
+                    ins_out[31:24] <=mem_din;
                     is_fetching <= `FALSE;
                     finish_ins <= `TRUE;
                     is_idle <= `TRUE;
                 end 
-                ins_offset <= ins_offset + 1;
-                mem_addr <= mem_addr+1;
+                if(ins_offset<4)begin
+                    ins_offset <= ins_offset + 1;
+                    mem_addr <= mem_addr + 1;
+                end
             end
         end  
     end
@@ -195,3 +199,4 @@ end
 
 
 endmodule
+`endif

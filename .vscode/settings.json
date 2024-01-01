@@ -57,5 +57,11 @@
   "C_Cpp_Runner.useLinkTimeOptimization": false,
   "C_Cpp_Runner.msvcSecureNoWarnings": false,
   "digital-ide.welcome.show": false,
-  "digital-ide.dont-show-again.propose.issue": true
+  "digital-ide.dont-show-again.propose.issue": true,
+  "files.associations": {
+    "io.h": "c",
+    "corecrt_io.h": "c",
+    "corecrt_share.h": "c",
+    "corecrt_wio.h": "c"
+  }
 }

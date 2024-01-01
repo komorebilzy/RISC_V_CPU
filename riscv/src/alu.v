@@ -1,5 +1,6 @@
 `include "defines.v"
-
+`ifndef alu
+`define alu
 module alu(
     input wire clk,
     input wire rst,
@@ -53,6 +54,9 @@ module alu(
                 `SLTI  : result = $signed(lhs) < $signed(imm);
                 `SLTU  : result = lhs < rhs;
                 `SLTIU : result = lhs < rhs;
+
+                `LUI : result = imm;
+                `AUIPC : result = imm;
                 `BEQ   : begin
                     if(lhs == rhs)begin
                         result = 1;
@@ -109,7 +113,7 @@ module alu(
                 end 
                 `JAL:begin
                     result = pc+4;
-                    CDB_pc = imm;
+                    CDB_pc = pc + imm;
                 end
                 `JALR  : begin
                     result = pc + 4;
@@ -126,3 +130,4 @@ module alu(
     end
 
 endmodule
+`endif

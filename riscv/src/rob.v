@@ -1,5 +1,6 @@
 `include "defines.v"
-
+`ifndef rob
+`define rob
 module rob(
     input wire clk,
     input wire rst,
@@ -38,6 +39,7 @@ module rob(
     output reg [31:0] rob_store_addr,
     output reg [31:0] rob_store_data,
     //from mem
+    input wire begin_real_store,
     input wire finish_store,
 
     //to regfile
@@ -52,7 +54,7 @@ module rob(
     output reg [31:0] pc_update,
     output reg [6:0] hash_idex_pc
 );
-    parameter ROB_SIZE = 32;
+    parameter ROB_SIZE = 32; 
     reg ready [ROB_SIZE-1:0];
     reg [`ROBENTRY] entry [ROB_SIZE-1:0];
     reg [31:0] value [ROB_SIZE-1:0];
@@ -70,14 +72,14 @@ module rob(
     assign next_head = (head + 1) % ROB_SIZE;
     assign next_tail = (tail + 1) % ROB_SIZE;
     assign empty = (head==tail);
-    assign full=(next_head==tail);
+    assign full=(next_tail==head);
     assign rob_full=full;
     assign entry_out = next_tail;
 
     integer i;
 
     always @(posedge clk) begin
-        if(clk || rollback) begin
+        if(rst || rollback) begin
             for(i=0; i < ROB_SIZE; i=i+1) begin
                 ready[i] <= 0;
                 entry[i] <= `ENTRY_NULL;
@@ -111,6 +113,7 @@ module rob(
         end
         else begin
             if(get_instruction)begin
+                // $display("the value of next_tail",next_tail);
                 ready[next_tail] <= `FALSE;
                 entry[next_tail] <= next_tail;
                 op[next_tail] <= op_in;
@@ -119,7 +122,7 @@ module rob(
                 tail <= next_tail;
             end
 
-            if(!empty && ready[next_head] && !is_storing )begin
+            if(!empty && ready[next_head] && !is_storing)begin
                 //here predictor
                 if(pc_real[next_head] != pc_predict[next_head]) begin
                     is_branch_ins <= `TRUE;
@@ -132,7 +135,7 @@ module rob(
                         is_branch_ins <= `TRUE;
                         update <= `FALSE;
                     end
-                    if(op[next_head]<`SB && op[next_head]>`SW)begin
+                    if(op[next_head]<`SB || op[next_head]>`SW)begin
                         commit_sgn <=  `TRUE;
                         rob_store_sgn <= `FALSE;
                         rob_entry <= entry[next_head];
@@ -146,16 +149,16 @@ module rob(
                         rob_store_sgn <= `TRUE;
                         commit_sgn <=  `FALSE;
                         rob_store_op <= op[next_head];
-                        rob_store_addr <= value[next_head];
-                        rob_store_data <= addr[next_head];
+                        rob_store_addr <= addr[next_head];
+                        rob_store_data <= value[next_head];
                         entry[next_head] <= `ENTRY_NULL;
                         ready[next_head] <= `FALSE;
                         is_storing <= `TRUE;                    
                     end
                 end
             end
+            else if(begin_real_store) rob_store_sgn <= `FALSE;
             else begin
-                rob_store_sgn <= `FALSE;
                 commit_sgn <=  `FALSE;
             end
 
@@ -199,3 +202,4 @@ module rob(
     end
 
 endmodule
+`endif

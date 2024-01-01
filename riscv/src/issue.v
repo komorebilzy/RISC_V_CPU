@@ -1,4 +1,7 @@
 //accept inst from ifetch,acquire V Q from regfile,assign entry and V Q imm to RS or LSB
+`include "defines.v"
+`ifndef issue
+`define issue
 module issue(
     input wire clk,
     input wire rst,
@@ -30,7 +33,7 @@ module issue(
     output wire [31:0] Vj,
     output wire [31:0] Vk,
     output wire [`ROBENTRY] Qj,
-    output wire [`ROBENTRY] Qk,
+    output wire [`ROBENTRY] Qk
     // output wire [31:0] imm_out,
     // output wire [5:0] op_out,
     // output wire [5:0] rd_out,
@@ -53,3 +56,4 @@ assign is_rs = !is_load_store;
 
 
 endmodule
+`endif

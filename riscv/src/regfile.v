@@ -1,4 +1,6 @@
 `include "defines.v"
+`ifndef regfile
+`define regfile
 module regfile(
         input wire clk,
         input wire rst,
@@ -32,10 +34,10 @@ module regfile(
     reg [`ROBENTRY] reorder[31:0];
     reg busy [31:0];
 
-    assign Qj = rs1 ==`NULL ? `ENTRY_NULL : busy[rs1] ? reorder[rs1] : `ENTRY_NULL;
-    assign Qk = rs2 ==`NULL ? `ENTRY_NULL : busy[rs2] ? reorder[rs2] : `ENTRY_NULL;
-    assign Vj = rs1 ==`NULL ? 32'b0 : busy[rs1] ? 32'b0 : value[rs1];
-    assign Vk = rs2 ==`NULL ? 32'b0 : busy[rs2] ? 32'b0 : value[rs2];
+    assign Qj = rs1 ==`NULL ? `ENTRY_NULL : (busy[rs1] ? reorder[rs1] : `ENTRY_NULL);
+    assign Qk = rs2 ==`NULL ? `ENTRY_NULL : (busy[rs2] ? reorder[rs2] : `ENTRY_NULL);
+    assign Vj = rs1 ==`NULL ? 32'b0 : (busy[rs1] ? 32'b0 : value[rs1]);
+    assign Vk = rs2 ==`NULL ? 32'b0 : (busy[rs2] ? 32'b0 : value[rs2]);
 
     integer i;
     always @(posedge clk)begin
@@ -61,9 +63,9 @@ module regfile(
 
             //commit 阶段
             if(commit_sgn && rob_des!=`NULL && rob_des!=0) begin
-                value[rob_des]=rob_result;
+                value[rob_des] <= rob_result;
                 if(reorder[rob_des]==rob_entry)begin
-                    busy[rob_des] <= `TRUE;
+                    busy[rob_des] <= `FALSE;
                     reorder[rob_des] <= `ENTRY_NULL;
                 end
             end
@@ -72,3 +74,4 @@ module regfile(
 
 
 endmodule
+`endif

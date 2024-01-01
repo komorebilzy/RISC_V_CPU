@@ -1,6 +1,9 @@
 //instruction fetch
 `include "defines.v"
 `include "decoder.v"
+`ifndef ifetch
+`define ifetch
+
 `define    stronglyNotTaken     2'b00
 `define    weaklyNotTaken       2'b01
 `define    weaklyTaken          2'b10
@@ -46,7 +49,7 @@ reg stop_fetching;
 assign rollback = update;
 assign pc_predict = pc_now;
 assign IC_addr = pc_now;
-assign IC_addr_sgn = stop_fetching;
+assign IC_addr_sgn = !stop_fetching;
 assign entry_rob = entry_idle;
 wire hash_idex_now =pc_now[6:0];
 
@@ -77,22 +80,25 @@ always@(posedge clk)begin
         stop_fetching <= `FALSE;
         issue_ins <= `FALSE;
         pc_now <= pc_update;
-        if(predict_cnt[hash_idex_pc] != `stronglyTaken) predict_cnt[hash_idex_pc]<=predict_cnt[hash_idex_pc]+1;
+        if(predict_cnt[hash_idex_pc] != `stronglyTaken) predict_cnt[hash_idex_pc] <= predict_cnt[hash_idex_pc]+1;
     end
     
     else begin
         if(IC_ins_sgn)begin
             pc <= pc_now;
             issue_ins <=  `TRUE;
-            if(op==`JAL) pc_now <= pc_now+imm;
+            if(op==`JAL) pc_now <= pc_now + imm;
             else if(op==`JALR) stop_fetching <= `TRUE;
-            else if(op>=`BEQ && op==`BGEU) begin
+            else if(op>=`BEQ && op<=`BGEU) begin
                 if(predict_cnt[hash_idex_now]==`weaklyTaken || predict_cnt[hash_idex_now]==`stronglyTaken) begin
-                    pc_now <= pc_now+imm;
+                    pc_now <= pc_now + imm;
                 end
                 else pc_now <= pc_now + 4;
             end
+            else pc_now <= pc_now + 4;
         end
+        else
+            issue_ins <=  `FALSE;
 
         if(is_branch_ins)begin
             if(update==`TRUE && predict_cnt[hash_idex_pc] != `stronglyTaken) predict_cnt[hash_idex_pc]<=predict_cnt[hash_idex_pc]+1;
@@ -103,3 +109,4 @@ end
 
 
 endmodule
+`endif

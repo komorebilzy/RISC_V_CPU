@@ -40,12 +40,13 @@ module cpu(
 wire [31:0] icache_pc_in;
 wire icache_pc_miss;
 wire icache_finish_ins;
-wire [511:0] icache_ins_out;
+wire [31:0] icache_ins_out;
 wire [31:0] rob_store_data;
 wire [31:0] rob_store_addr;
 wire [5:0] rob_store_op;
 wire rob_store_sgn;
 wire rob_store_finish;
+wire begin_real_store;
 wire [31:0] lsb_load_addr;
 wire [5:0] lsb_load_op;
 wire lsb_load_sgn;
@@ -78,8 +79,6 @@ wire issue_ins;
 wire issue_is_load_store;
 
 //issue
-wire is_ls;
-wire is_rs;
 wire [31:0] issue_Vj_out;
 wire [31:0] issue_Vk_out;
 wire [`ROBENTRY] issue_Qj_out;
@@ -98,11 +97,6 @@ wire rs_full;
 wire lsb_full;
 
 wire rob_full;
-wire rs_broadcast;
-wire [`ROBENTRY] rs_entry_out;
-wire [31:0] rs_result;
-wire [31:0] rs_pc_out;
-wire [31:0] rs_pc_init;
 wire lsb_load_broadcast;
 wire [`ROBENTRY] load_entry_out;
 wire [31:0] load_result;
@@ -138,6 +132,7 @@ memory_control u_memory_control(
   .store_addr_in(rob_store_addr),
   .store_op(rob_store_op),
   .store_sgn(rob_store_sgn),
+  .begin_real_store(begin_real_store),
   .finish_store(rob_store_finish),
   .load_addr(lsb_load_addr),
   .load_op(lsb_load_op),
@@ -190,33 +185,6 @@ ifetch u_ifetch(
   .is_load_store(issue_is_load_store)
 );
 
-// issue u_issue(
-//   .clk(clk_in),
-//   .rdy(rdy_in),
-//   .rst(rst_in),
-//   .entry_rob(issue_entry),
-//   .pc(issue_pc),
-//   .rd(issue_rd),
-//   .imm(issue_imm),
-//   .op(issue_op),
-//   .is_load_store(issue_is_load_store),
-//   .Vj_from_reg(Vj_reg),
-//   .Vk_from_reg(Vk_reg),
-//   .Qj_from_reg(Qj_reg),
-//   .Qk_from_reg(Qk_reg),
-//   .is_ls(is_ls),
-//   .is_rs(is_rs),
-//   // .pc_now_in(issue_pc_out),
-//   // .entry_out(issue_entry_out),
-//   .Vj(issue_Vj_out),
-//   .Vk(issue_Vk_out),
-//   .Qj(issue_Qj_out),
-//   .Qk(issue_Qk_out),
-//   // .imm_out(issue_imm_out),
-//   // .op_out(issue_op_out),
-//   // .rd_out(issue_rd_out)
-// );
-
 regfile u_regfile(
   .clk(clk_in),
   .rst(rst_in),
@@ -263,6 +231,7 @@ rs u_rs(
   .rdy(rdy_in),
   .rst(rst_in),
   .get_instruction(issue_ins),
+  .is_load_store(issue_is_load_store),
   .pc_now_in(issue_pc),
   .entry_in(issue_entry),
   .rollback(rollbcak),
@@ -291,11 +260,6 @@ rs u_rs(
   .lsb_broadcast(lsb_load_broadcast),
   .lsb_result(load_result),
   .lsb_entry(load_entry_out),
-  .rs_broadcast(rs_broadcast),
-  .rs_entry_out(rs_entry_out),
-  .rs_result(rs_result),
-  .rs_pc_out(rs_pc_out),
-  .rs_pc_init(rs_pc_init),
   .rob_commit(reg_commit_sgn),
   .rob_entry(rob_commit_entry),
   .rob_result(rob_commit_result)
@@ -306,6 +270,7 @@ lsb u_lsb(
   .rdy(rdy_in),
   .rst(rst_in),
   .get_instruction(issue_ins),
+  .is_load_store(issue_is_load_store),
   .pc_now_in(issue_pc),
   .entry_in(issue_entry),
   .rollback(rollbcak),
@@ -356,11 +321,11 @@ rob u_rob(
   .rob_full(rob_full),
   .rollback(rollback),
 
-  .rs_broadcast(rs_broadcast),
-  .rs_entry_out(rs_entry_out),
-  .rs_result(rs_result),
-  .rs_pc_out(rs_pc_out),
-  .rs_pc_init(rs_pc_init),
+  .rs_broadcast(alu_broadcast),
+  .rs_entry_out(alu_entry_out),
+  .rs_result(alu_result_out),
+  .rs_pc_out(alu_pc_out),
+  .rs_pc_init(alu_pc_init_out),
   .lsb_load_broadcast(lsb_load_broadcast),
   .load_entry_out(load_entry_out),
   .load_result(load_result),
@@ -374,6 +339,7 @@ rob u_rob(
   .rob_store_op(rob_store_op),
   .rob_store_addr(rob_store_addr),
   .rob_store_data(rob_store_data),
+  .begin_real_store(begin_real_store),
   .finish_store(rob_store_finish),
 
   .commit_sgn(reg_commit_sgn),

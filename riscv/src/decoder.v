@@ -1,6 +1,7 @@
 //解析指令 得到op,rs1,rs2,rd,imm等
 `include "defines.v"
-
+`ifndef decoder
+`define decoder
 module decoder(
     input wire [31:0] inst,
 
@@ -12,7 +13,7 @@ module decoder(
     output reg [5:0] op
 );
 
-wire [2:0] func3=inst[19:15]; //R I S B type
+wire [2:0] func3=inst[14:12]; //R I S B type
 wire [6:0] func7=inst[31:25]; //R type
 wire [6:0] opcode=inst[6:0];
 
@@ -137,5 +138,6 @@ always @(*) begin
 end
 
 endmodule
+`endif
 
 

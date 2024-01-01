@@ -1,5 +1,6 @@
 `include "defines.v"
-
+`ifndef lsb
+`define lsb
 module lsb(
     input wire clk,
     input wire rst,
@@ -7,6 +8,7 @@ module lsb(
 
 //issue
     input wire get_instruction,
+    input wire is_load_store,
     input wire [31:0] pc_now_in,
     input wire [`ROBENTRY] entry_in,
     output wire lsb_full,
@@ -77,7 +79,7 @@ module lsb(
     assign next_head = (head+1) % LSB_SIZE;
     assign next_tail = (tail+1) % LSB_SIZE;
     assign empty = (head==tail);
-    assign full=(next_head==tail);
+    assign full=(head==next_tail);
     assign lsb_full=full;
     assign pc_out = pc_now_in + 4;
 
@@ -114,7 +116,7 @@ module lsb(
         end
         else begin
             //issue
-            if(get_instruction)begin
+            if(get_instruction && is_load_store)begin
                 op[next_tail] <= op_in;
                 entry[next_tail] <= entry_in;
                 imm[next_tail] <= imm_in;
@@ -156,6 +158,7 @@ module lsb(
                         end
                     end
                 end
+                lsb_load_broadcast <=`FALSE;
             end
 
             if(rob_commit)begin
@@ -176,12 +179,19 @@ module lsb(
             case(state[next_head])
             `WAITING: begin
                 if(Qj[next_head] == `ENTRY_NULL && Qk[next_head] == `ENTRY_NULL)begin
-                    load_store_sgn <= 1;
-                    // load_or_store <= op[next_head]>=`LB && op[next_head]<=`LHU; //1 means load ans 0 means store
-                    load_store_op <= op[next_head];
-                    load_store_addr <= Vj[next_head] + imm[next_head];
-                    // load_store_data <= Vk[next_head];
-                    state[next_head] <= op[next_head]>=`LB && op[next_head]<=`LHU ? `LOAD_FINISHED : `STORE_PRE;
+                    if(op[next_head]>=`LB && op[next_head]<=`LHU)begin
+                        state[next_head] <= `LOAD_FINISHED;
+                        load_store_sgn <= 1;
+                        load_store_op <= op[next_head];
+                        load_store_addr <= Vj[next_head] + imm[next_head];
+                    end
+                    else begin
+                        state[next_head] <= `IS_STORING;
+                        lsb_store_broadcast <= `TRUE;
+                        store_entry_out <= entry[next_head];
+                        store_addr <= Vj[next_head] + imm[next_head];
+                        store_result <= Vk[next_head];
+                    end
                 end
                     
             end
@@ -196,16 +206,9 @@ module lsb(
                 end
             end
 
-            `STORE_PRE: begin
-                state[next_head] <= `IS_STORING;
-                lsb_store_broadcast <= `TRUE;
-                store_entry_out <= entry[next_head];
-                store_addr <= Vj[next_head] + imm[next_head];
-                store_result <= Vk[next_head];
-            end
-
             `IS_STORING :begin
                 if(finish_store)begin
+                    lsb_store_broadcast <= `FALSE;
                     state[next_head] <= `EMPTY;
                     head <= next_head;
                 end
@@ -215,3 +218,4 @@ module lsb(
     end
 
 endmodule
+`endif
