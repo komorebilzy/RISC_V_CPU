@@ -41,7 +41,7 @@ module lsb(
     output reg [`ROBENTRY] store_entry_out,
     output reg [31:0] store_addr,
     output reg [31:0] store_result,
-    output wire [31:0] pc_out,
+    // output wire [31:0] pc_out,
 
 //commit
     //from rob
@@ -81,7 +81,7 @@ module lsb(
     assign empty = (head==tail);
     assign full=(head==next_tail);
     assign lsb_full=full;
-    assign pc_out = pc_now_in + 4;
+    // assign pc_out = pc_now_in + 4;
 
     integer i;
     always @(posedge clk)begin
@@ -100,8 +100,6 @@ module lsb(
             tail  <= 0;
             load_store_sgn <= 0;
             load_store_addr   <= 0;
-            // load_store_data   <= 0;
-            // load_or_store     <= 0;
             load_store_op     <= 0;
             lsb_load_broadcast<= 0;
             load_entry_out    <= 0;
@@ -117,6 +115,11 @@ module lsb(
         else begin
             //issue
             if(get_instruction && is_load_store)begin
+                //  $display("new ins of lsb",next_tail);
+                //     $display(" the entry_rob",entry_in);
+                //     $display(" the op",op_in);
+                //     $display(" the imm",imm_in);
+                //     $display(Vj_in,Vk_in);
                 op[next_tail] <= op_in;
                 entry[next_tail] <= entry_in;
                 imm[next_tail] <= imm_in;
@@ -181,12 +184,13 @@ module lsb(
                 if(Qj[next_head] == `ENTRY_NULL && Qk[next_head] == `ENTRY_NULL)begin
                     if(op[next_head]>=`LB && op[next_head]<=`LHU)begin
                         state[next_head] <= `LOAD_FINISHED;
-                        load_store_sgn <= 1;
+                        load_store_sgn <= `TRUE;
                         load_store_op <= op[next_head];
                         load_store_addr <= Vj[next_head] + imm[next_head];
                     end
                     else begin
                         state[next_head] <= `IS_STORING;
+                        //it is to rob
                         lsb_store_broadcast <= `TRUE;
                         store_entry_out <= entry[next_head];
                         store_addr <= Vj[next_head] + imm[next_head];
@@ -198,6 +202,7 @@ module lsb(
 
             `LOAD_FINISHED: begin
                 if(mem_valid) begin
+                    load_store_sgn <= `FALSE;
                     lsb_load_broadcast <= `TRUE;
                     load_entry_out <= entry[next_head];
                     load_result <= mem_res;

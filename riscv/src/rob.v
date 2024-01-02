@@ -29,7 +29,7 @@ module rob(
     input wire [`ROBENTRY] store_entry_out,
     input wire [31:0] store_addr,
     input wire [31:0] store_result,
-    input wire [31:0] lsb_pc_out,
+    // input wire [31:0] lsb_pc_out,
 
     
     //commit 
@@ -124,13 +124,19 @@ module rob(
 
             if(!empty && ready[next_head] && !is_storing)begin
                 //here predictor
-                if(pc_real[next_head] != pc_predict[next_head]) begin
+                if(op[next_head]>=`BEQ &&op[next_head]<=`BGEU && pc_real[next_head] != pc_predict[next_head]) begin
+                    // $display("predic false,the value of next_head",next_head);
+                    // $display(" the value of op",op[next_head]);
+                    // $display(" the value of pc_real",pc_real[next_head]," ",pc_predict[next_head]);
                     is_branch_ins <= `TRUE;
                     update <= `TRUE;
                     pc_update <= pc_real[next_head];
                     hash_idex_pc <= pc_init[next_head][6:0];
                 end 
                 else begin
+                    // $display("ready and need commit,the value of next_head",next_head);
+                    // $display(" the value of op",op[next_head]);
+                    // $display(" the value of pc_real",pc_real[next_head]);
                     if(op[next_head]>=`BEQ && op[next_head]<=`BGEU)begin
                         is_branch_ins <= `TRUE;
                         update <= `FALSE;
@@ -146,6 +152,10 @@ module rob(
                         head <= next_head;
                     end
                     else begin
+                    //     $display("ready and need commit,store the value of next_head",next_head);
+                    // $display(" the value of op",op[next_head]);
+                    // $display(" the address",addr[next_head]);
+                    // $display(" the value",value[next_head]);
                         rob_store_sgn <= `TRUE;
                         commit_sgn <=  `FALSE;
                         rob_store_op <= op[next_head];
@@ -172,7 +182,7 @@ module rob(
                     if(entry[i]==load_entry_out)begin
                         ready[i] <= `TRUE;
                         value[i] <= load_result;
-                        pc_real[i] <= lsb_pc_out;
+                        // pc_real[i] <= lsb_pc_out;
                     end
                 end
             end
@@ -183,7 +193,8 @@ module rob(
                         ready[i] <= `TRUE;
                         addr[i] <= store_addr;
                         value[i] <= store_result;
-                        pc_real[i] <= lsb_pc_out;
+                        // pc_real[i] <= lsb_pc_out;
+                        // $display(" lsb_store_broadcast",i," ",lsb_pc_out);
                     end
                 end
             end
@@ -195,6 +206,7 @@ module rob(
                         value[i] <= rs_result;
                         pc_real[i] <= rs_pc_out;
                         pc_init[i] <= rs_pc_init;
+                        // $display(" rs_broadcast",rs_pc_out);
                     end
                 end
             end

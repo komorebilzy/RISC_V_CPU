@@ -35,7 +35,7 @@ module memory_control(
     output reg mem_rw  //0 for read and 1 for write
 );
 
-reg [2:0] ins_offset;  //四次与ram交互得到一个指令，icache miss后需要读取一行（16条指令）
+reg [2:0] ins_offset;  
 reg [1:0] store_offset;
 reg [2:0] load_offset;
 reg [31:0] addr_record;

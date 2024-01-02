@@ -85,7 +85,8 @@ always@(posedge clk)begin
     
     else begin
         if(IC_ins_sgn)begin
-            pc <= pc_now;
+            $display(pc_now," ",IC_ins," ",op);
+            pc <= pc_now; 
             issue_ins <=  `TRUE;
             if(op==`JAL) pc_now <= pc_now + imm;
             else if(op==`JALR) stop_fetching <= `TRUE;

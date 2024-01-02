@@ -104,7 +104,7 @@ wire lsb_store_broadcast;
 wire [`ROBENTRY] store_entry_out;
 wire [31:0] store_addr;
 wire [31:0] store_result;
-wire [31:0] lsb_pc_out;
+// wire [31:0] lsb_pc_out;
 
 //alu
 wire calculate;
@@ -294,7 +294,7 @@ lsb u_lsb(
   .store_entry_out(store_entry_out),
   .store_addr(store_addr),
   .store_result(store_result),
-  .pc_out(lsb_pc_out),
+  // .pc_out(lsb_pc_out),
 
   .rob_commit(reg_commit_sgn),
   .rob_entry(rob_commit_entry),
@@ -333,7 +333,7 @@ rob u_rob(
   .store_entry_out(store_entry_out),
   .store_addr(store_addr),
   .store_result(store_result),
-  .lsb_pc_out(lsb_pc_out),
+  // .lsb_pc_out(lsb_pc_out),
 
   .rob_store_sgn(rob_store_sgn),
   .rob_store_op(rob_store_op),
