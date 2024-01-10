@@ -52,6 +52,7 @@ module rob(
     output reg is_branch_ins,
     output reg update,
     output reg [31:0] pc_update,
+    output reg is_jalr,
     output reg [6:0] hash_idex_pc
 );
     parameter ROB_SIZE = 32; 
@@ -113,7 +114,6 @@ module rob(
         end
         else begin
             if(get_instruction)begin
-                // $display("the value of next_tail",next_tail);
                 ready[next_tail] <= `FALSE;
                 entry[next_tail] <= next_tail;
                 op[next_tail] <= op_in;
@@ -124,23 +124,25 @@ module rob(
 
             if(!empty && ready[next_head] && !is_storing)begin
                 //here predictor
+                if(op[next_head] == `JALR)begin
+                    is_jalr <= `TRUE;
+                    pc_update <= pc_real[next_head];
+                end
+                else is_jalr <= `FALSE;
                 if(op[next_head]>=`BEQ &&op[next_head]<=`BGEU && pc_real[next_head] != pc_predict[next_head]) begin
-                    // $display("predic false,the value of next_head",next_head);
-                    // $display(" the value of op",op[next_head]);
-                    // $display(" the value of pc_real",pc_real[next_head]," ",pc_predict[next_head]);
                     is_branch_ins <= `TRUE;
                     update <= `TRUE;
                     pc_update <= pc_real[next_head];
                     hash_idex_pc <= pc_init[next_head][6:0];
                 end 
                 else begin
-                    // $display("ready and need commit,the value of next_head",next_head);
-                    // $display(" the value of op",op[next_head]);
-                    // $display(" the value of pc_real",pc_real[next_head]);
+                    update <= `FALSE;
                     if(op[next_head]>=`BEQ && op[next_head]<=`BGEU)begin
+                        // $display("branching!!!!!!");
                         is_branch_ins <= `TRUE;
-                        update <= `FALSE;
                     end
+                    else 
+                        is_branch_ins <= `FALSE;
                     if(op[next_head]<`SB || op[next_head]>`SW)begin
                         commit_sgn <=  `TRUE;
                         rob_store_sgn <= `FALSE;
@@ -152,10 +154,6 @@ module rob(
                         head <= next_head;
                     end
                     else begin
-                    //     $display("ready and need commit,store the value of next_head",next_head);
-                    // $display(" the value of op",op[next_head]);
-                    // $display(" the address",addr[next_head]);
-                    // $display(" the value",value[next_head]);
                         rob_store_sgn <= `TRUE;
                         commit_sgn <=  `FALSE;
                         rob_store_op <= op[next_head];
@@ -170,6 +168,9 @@ module rob(
             else if(begin_real_store) rob_store_sgn <= `FALSE;
             else begin
                 commit_sgn <=  `FALSE;
+                is_jalr <= `FALSE;
+                is_branch_ins <= `FALSE;
+                update <=  `FALSE;
             end
 
             if(finish_store) begin
@@ -182,7 +183,6 @@ module rob(
                     if(entry[i]==load_entry_out)begin
                         ready[i] <= `TRUE;
                         value[i] <= load_result;
-                        // pc_real[i] <= lsb_pc_out;
                     end
                 end
             end

@@ -7,6 +7,7 @@ module memory_control(
     input wire rst,
     input wire rdy,
 
+    input wire rollback,
     //from icache
     input wire [31:0] pc_in,
     input wire pc_miss_sgn,
@@ -48,7 +49,7 @@ reg is_fetching;
 assign begin_real_store= is_storing;
 
 always @(posedge clk) begin
-    if(rst)begin
+    if(rst || rollback)begin
         is_idle <= `TRUE;
         is_storing <= `FALSE;
         is_loading <= `FALSE;
@@ -78,7 +79,6 @@ always @(posedge clk) begin
                 is_storing <= `TRUE;
                 is_idle<=  `FALSE;
                 addr_record <= store_addr_in;
-                mem_rw <= 1;
                 case(store_op)
                     `SB: begin   store_offset<= 2'b01;   end
                     `SH: begin   store_offset<= 2'b10;   end
@@ -107,6 +107,7 @@ always @(posedge clk) begin
         end
         else begin
             if(is_storing)begin
+                mem_rw <= 1;  //big bug:应该在此处修改mem_rw状态而不是在前面的store_sgn，否则会把正在读取的地址的数据修改掉
                 if(store_op==`SW)begin
                     if(store_offset==2'b11) mem_dout <= store_data_in[7:0];
                     else if(store_offset==2'b10) mem_dout <= store_data_in[15:8];

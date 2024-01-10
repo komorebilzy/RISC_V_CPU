@@ -17,7 +17,7 @@ wire [2:0] func3=inst[14:12]; //R I S B type
 wire [6:0] func7=inst[31:25]; //R type
 wire [6:0] opcode=inst[6:0];
 
-wire [31:0] immI={{20{inst[31]}},inst[31:10]};
+wire [31:0] immI={{20{inst[31]}},inst[31:20]};
 wire [31:0] immS={{20{inst[31]}},inst[31:25],inst[11:7]};
 wire [31:0] immB={{20{inst[31]}},{inst[7]},inst[30:25],inst[11:8],1'b0};
 wire [31:0] immU={inst[31:12],12'b0};

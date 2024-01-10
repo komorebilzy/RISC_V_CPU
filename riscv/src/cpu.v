@@ -65,6 +65,7 @@ wire [31:0] rob_pc_predict;
 wire rob_update;
 wire rob_is_branch_ins;
 wire [31:0] rob_pc_update;
+wire rob_is_jalr;
 wire [6:0] hash_idex_pc;
 wire rollback;
 
@@ -124,6 +125,7 @@ memory_control u_memory_control(
   .clk(clk_in),
   .rst(rst_in),
   .rdy(rdy_in),
+  .rollback(rollback),
   .pc_in(icache_pc_in),
   .pc_miss_sgn(icache_pc_miss),
   .finish_ins(icache_finish_ins),
@@ -149,6 +151,7 @@ icache u_icache(
   .clk(clk_in),
   .rst(rst_in),
   .rdy(rdy_in),
+  .rollback(rollback),
   .MC_val(icache_ins_out),
   .MC_val_sgn(icache_finish_ins),
   .Mc_addr(icache_pc_in),
@@ -172,6 +175,7 @@ ifetch u_ifetch(
   .update(rob_update),
   .is_branch_ins(rob_is_branch_ins),
   .pc_update(rob_pc_update),
+  .is_jalr(rob_is_jalr),
   .hash_idex_pc(hash_idex_pc),
   .rollback(rollback),
   .entry_rob(issue_entry),
@@ -189,7 +193,6 @@ regfile u_regfile(
   .clk(clk_in),
   .rst(rst_in),
   .rdy(rdy_in),
-  .rollback(rollback),
   .rd(issue_rd),
   .rs1(issue_rs1),
   .rs2(issue_rs2),
@@ -350,6 +353,7 @@ rob u_rob(
   .is_branch_ins(rob_is_branch_ins),
   .update(rob_update),
   .pc_update(rob_pc_update),
+  .is_jalr(rob_is_jalr),
   .hash_idex_pc(hash_idex_pc)
 );
 

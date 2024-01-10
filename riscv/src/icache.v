@@ -7,6 +7,7 @@ module icache(
     input wire clk,
     input wire rst,
     input wire rdy,
+    input wire rollback,
 
     //MemCtrl
     input wire [31:0] MC_val,
@@ -53,7 +54,6 @@ module icache(
             if(!miss && !is_new_from_mem) begin
                 IF_val <= cur_ins;
                 IF_val_sgn <= `TRUE;
-                is_new_from_mem <= 0;
             end 
             else begin
                 IF_val <= MC_val;

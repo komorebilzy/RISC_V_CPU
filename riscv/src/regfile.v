@@ -8,7 +8,6 @@ module regfile(
 
         //issue阶段
         //from decoder
-        input wire rollback,
         input  wire [5:0] rd,
         input wire [5:0] rs1,
         input wire [5:0] rs2,
@@ -41,8 +40,14 @@ module regfile(
 
     integer i;
     always @(posedge clk)begin
+        // if(rs1==13)begin
+        //     $display("rs1==13 and value[13]",value[13]);
+        // end
+        // if(rob_des==13)begin
+        //     $display("rd==13 and value[13]",rob_result);
+        // end
         //清空
-        if(rst || rollback)begin 
+        if(rst )begin 
             for(i=0;i<32;i=i+1)begin
                 value[i] <= 0;
                 reorder[i] <= `ENTRY_NULL;

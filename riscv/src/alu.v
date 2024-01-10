@@ -24,7 +24,7 @@ module alu(
 );
    
     wire [4:0] shamt;
-    assign shamt = imm[24:20]; 
+    assign shamt = imm[4:0]; 
     assign CDB_sgn = RS_sgn;
     assign CDB_ROB_name = ROB_entry;
 
@@ -47,7 +47,11 @@ module alu(
                 `SLL   : result = lhs << rhs[4:0];
                 `SLLI  : result = lhs << shamt;
                 `SRL   : result = lhs >>> rhs[4:0];
-                `SRLI  : result = lhs >>> shamt;
+                `SRLI  : begin
+                    
+                    result = lhs >>> shamt;
+                    // $display("result ",result,"lhs ",lhs,"shamt",shamt);
+                end
                 `SRA   : result = lhs >> rhs[4:0];
                 `SRAI  : result = lhs >> shamt;
                 `SLT   : result = $signed(lhs) < $signed(rhs);

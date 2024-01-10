@@ -25,6 +25,7 @@ module ifetch(
     output wire [31:0] pc_predict,
     input wire update,
     input wire is_branch_ins,
+    input wire is_jalr,
     input wire [31:0] pc_update,
     input wire [6:0] hash_idex_pc,
     
@@ -44,7 +45,6 @@ module ifetch(
 reg [1:0] predict_cnt[127:0];
 reg [31:0] pc_now;
 reg stop_fetching;
-
 
 assign rollback = update;
 assign pc_predict = pc_now;
@@ -74,6 +74,7 @@ always@(posedge clk)begin
         issue_ins <= `FALSE;
     end
     else if(!rdy)begin
+        stop_fetching <= `TRUE;
         //pause
     end
     else if(rollback)begin
@@ -105,6 +106,12 @@ always@(posedge clk)begin
             if(update==`TRUE && predict_cnt[hash_idex_pc] != `stronglyTaken) predict_cnt[hash_idex_pc]<=predict_cnt[hash_idex_pc]+1;
             else if(update==`FALSE && predict_cnt[hash_idex_pc] != `stronglyNotTaken) predict_cnt[hash_idex_pc]<=predict_cnt[hash_idex_pc]-1;
         end
+
+        if(is_jalr) begin
+            pc_now <= pc_update;
+            stop_fetching <= `FALSE;
+        end
+
     end
 end
 
