@@ -5,6 +5,7 @@ module regfile(
         input wire clk,
         input wire rst,
         input wire rdy,
+        input wire rollback,
 
         //issue阶段
         //from decoder
@@ -40,16 +41,22 @@ module regfile(
 
     integer i;
     always @(posedge clk)begin
-        // if(rs1==13)begin
-        //     $display("rs1==13 and value[13]",value[13]);
+        // if(rs2==14)begin
+        //     $display("value[14]",value[14]);
         // end
         // if(rob_des==13)begin
         //     $display("rd==13 and value[13]",rob_result);
         // end
         //清空
-        if(rst )begin 
+        if(rst)begin 
             for(i=0;i<32;i=i+1)begin
                 value[i] <= 0;
+                reorder[i] <= `ENTRY_NULL;
+                busy[i] <= `FALSE;                
+            end
+        end
+        else if(rollback)begin
+            for(i=0;i<32;i=i+1)begin
                 reorder[i] <= `ENTRY_NULL;
                 busy[i] <= `FALSE;                
             end
@@ -68,6 +75,9 @@ module regfile(
 
             //commit 阶段
             if(commit_sgn && rob_des!=`NULL && rob_des!=0) begin
+        //          if(rob_entry==1)begin
+        //     $display("value[1] commit",rob_result);
+        // end
                 value[rob_des] <= rob_result;
                 if(reorder[rob_des]==rob_entry)begin
                     busy[rob_des] <= `FALSE;

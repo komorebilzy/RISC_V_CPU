@@ -30,6 +30,7 @@ module alu(
 
     always @(*) begin
         if(RS_sgn)begin
+            
             CDB_pc_init = pc;
             CDB_pc = pc + 4;
             result = 0;
@@ -47,11 +48,7 @@ module alu(
                 `SLL   : result = lhs << rhs[4:0];
                 `SLLI  : result = lhs << shamt;
                 `SRL   : result = lhs >>> rhs[4:0];
-                `SRLI  : begin
-                    
-                    result = lhs >>> shamt;
-                    // $display("result ",result,"lhs ",lhs,"shamt",shamt);
-                end
+                `SRLI  : result = lhs >>> shamt;
                 `SRA   : result = lhs >> rhs[4:0];
                 `SRAI  : result = lhs >> shamt;
                 `SLT   : result = $signed(lhs) < $signed(rhs);
@@ -62,6 +59,7 @@ module alu(
                 `LUI : result = imm;
                 `AUIPC : result = imm;
                 `BEQ   : begin
+                    // $display("beq||| ",lhs ," ",rhs);
                     if(lhs == rhs)begin
                         result = 1;
                         CDB_pc = pc + imm;
@@ -71,6 +69,7 @@ module alu(
                     end
                 end
                 `BNE   : begin
+                    // $display("bne!!!!!!!!");
                     if(lhs != rhs)begin
                         result = 1;
                         CDB_pc = pc + imm;
@@ -122,14 +121,16 @@ module alu(
                 `JALR  : begin
                     result = pc + 4;
                     CDB_pc = (lhs + imm) & ~(32'b1); 
-                end  
-                //lhs=x[rs1] rhs=signed_extended offset
+                end
                 default:begin
                     result = 0;
                     CDB_pc = 0;
                 end 
 
             endcase
+            // if(ROB_entry==10) begin
+            //     $display("lhs ",lhs,"rhs ",imm,"result ",result);
+            // end
         end
     end
 

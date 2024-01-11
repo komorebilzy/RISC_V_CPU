@@ -47,6 +47,7 @@ wire [5:0] rob_store_op;
 wire rob_store_sgn;
 wire rob_store_finish;
 wire begin_real_store;
+wire begin_real_load;
 wire [31:0] lsb_load_addr;
 wire [5:0] lsb_load_op;
 wire lsb_load_sgn;
@@ -58,6 +59,7 @@ wire [31:0] IF_addr;
 wire IF_addr_sgn;
 wire [31:0] IF_val;
 wire IF_val_sgn;
+wire pc_change;
 
 //ifetch
 wire [5:0] rob_entry_idle;
@@ -135,6 +137,7 @@ memory_control u_memory_control(
   .store_op(rob_store_op),
   .store_sgn(rob_store_sgn),
   .begin_real_store(begin_real_store),
+  .begin_real_load(begin_real_load),
   .finish_store(rob_store_finish),
   .load_addr(lsb_load_addr),
   .load_op(lsb_load_op),
@@ -156,6 +159,7 @@ icache u_icache(
   .MC_val_sgn(icache_finish_ins),
   .Mc_addr(icache_pc_in),
   .Mc_addr_sgn(icache_pc_miss),
+  .pc_change(pc_change),
   .IF_addr(IF_addr),
   .IF_addr_sgn(IF_addr_sgn),
   .IF_val(IF_val),
@@ -168,6 +172,7 @@ ifetch u_ifetch(
   .rdy(rdy_in),
   .IC_ins_sgn(IF_val_sgn),
   .IC_ins(IF_val),
+  .pc_change(pc_change),
   .IC_addr(IF_addr),
   .IC_addr_sgn(IF_addr_sgn),
   .entry_idle(rob_entry_idle),
@@ -193,6 +198,7 @@ regfile u_regfile(
   .clk(clk_in),
   .rst(rst_in),
   .rdy(rdy_in),
+  .rollback(rollback),
   .rd(issue_rd),
   .rs1(issue_rs1),
   .rs2(issue_rs2),
@@ -237,7 +243,7 @@ rs u_rs(
   .is_load_store(issue_is_load_store),
   .pc_now_in(issue_pc),
   .entry_in(issue_entry),
-  .rollback(rollbcak),
+  .rollback(rollback),
   .rs_full(rs_full),
   .Vj_in(issue_Vj_out),
   .Vk_in(issue_Vk_out),
@@ -276,7 +282,7 @@ lsb u_lsb(
   .is_load_store(issue_is_load_store),
   .pc_now_in(issue_pc),
   .entry_in(issue_entry),
-  .rollback(rollbcak),
+  .rollback(rollback),
   .lsb_full(lsb_full),
   .Vj_in(issue_Vj_out),
   .Vk_in(issue_Vk_out),
@@ -308,6 +314,7 @@ lsb u_lsb(
   .load_store_sgn(lsb_load_sgn),
   .load_store_op(lsb_load_op),
   .load_store_addr(lsb_load_addr),
+  .begin_real_load(begin_real_load),
   .finish_store(rob_store_finish)
 
 );
@@ -317,6 +324,7 @@ rob u_rob(
   .rst(rst_in),
   .rdy(rdy_in),
   .get_instruction(issue_ins),
+  .get_ins(IF_val),
   .op_in(issue_op),
   .rd_in(issue_rd),
   .pc_pred(rob_pc_predict),

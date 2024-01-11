@@ -16,6 +16,7 @@ module ifetch(
     //from icache
     input wire IC_ins_sgn,
     input wire [31:0] IC_ins,
+    output reg pc_change,
     output wire [31:0] IC_addr,
     output wire IC_addr_sgn,
 
@@ -32,13 +33,13 @@ module ifetch(
     output wire rollback,
     
     output wire [5:0] entry_rob,
-    output reg [31:0] pc,
+    output wire [31:0] pc,
     output wire [5:0] rd,
     output wire [5:0] rs1,
     output wire [5:0] rs2,
     output wire [31:0] imm,
     output wire [5:0] op,
-    output reg issue_ins,
+    output wire issue_ins,
     output wire is_load_store
 );
 
@@ -63,6 +64,9 @@ decoder u_decoder(
     .op(op)
 );
 
+assign issue_ins=IC_ins_sgn && !rollback;
+assign pc= pc_now;
+
 integer i;
 always@(posedge clk)begin
     if(rst)begin
@@ -71,7 +75,7 @@ always@(posedge clk)begin
         end
         pc_now <= 0;
         stop_fetching <= `FALSE;
-        issue_ins <= `FALSE;
+        pc_change <= `FALSE;
     end
     else if(!rdy)begin
         stop_fetching <= `TRUE;
@@ -79,16 +83,18 @@ always@(posedge clk)begin
     end
     else if(rollback)begin
         stop_fetching <= `FALSE;
-        issue_ins <= `FALSE;
+        pc_change <= `TRUE;
         pc_now <= pc_update;
-        if(predict_cnt[hash_idex_pc] != `stronglyTaken) predict_cnt[hash_idex_pc] <= predict_cnt[hash_idex_pc]+1;
+        // if(pc_now==4148) $display("4148 jump ");
+        if(predict_cnt[hash_idex_pc] == `weaklyTaken|| predict_cnt[hash_idex_pc]==`stronglyTaken) predict_cnt[hash_idex_pc] <= predict_cnt[hash_idex_pc]-1;
+        else predict_cnt[hash_idex_pc] <= predict_cnt[hash_idex_pc]+1;
     end
     
     else begin
         if(IC_ins_sgn)begin
-            $display(pc_now," ",IC_ins," ",op);
-            pc <= pc_now; 
-            issue_ins <=  `TRUE;
+            // $display(pc_now," ",);
+            // $display(pc_now," ",IC_ins," ",op);
+            if(op!= `JALR)pc_change <=  `TRUE;
             if(op==`JAL) pc_now <= pc_now + imm;
             else if(op==`JALR) stop_fetching <= `TRUE;
             else if(op>=`BEQ && op<=`BGEU) begin
@@ -99,19 +105,19 @@ always@(posedge clk)begin
             end
             else pc_now <= pc_now + 4;
         end
-        else
-            issue_ins <=  `FALSE;
+        else begin
+            if(is_jalr) begin
+                pc_change <=  `TRUE;
+                pc_now <= pc_update;
+                stop_fetching <= `FALSE;
+            end
+            else pc_change <=  `FALSE;
+        end
 
         if(is_branch_ins)begin
             if(update==`TRUE && predict_cnt[hash_idex_pc] != `stronglyTaken) predict_cnt[hash_idex_pc]<=predict_cnt[hash_idex_pc]+1;
             else if(update==`FALSE && predict_cnt[hash_idex_pc] != `stronglyNotTaken) predict_cnt[hash_idex_pc]<=predict_cnt[hash_idex_pc]-1;
         end
-
-        if(is_jalr) begin
-            pc_now <= pc_update;
-            stop_fetching <= `FALSE;
-        end
-
     end
 end
 

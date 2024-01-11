@@ -16,6 +16,7 @@ module icache(
     output wire Mc_addr_sgn, //true means really miss while false means no
 
     //Ifetch
+    input wire pc_change,
     input wire [31:0] IF_addr,
     input wire IF_addr_sgn,
     output reg [31:0] IF_val,
@@ -28,7 +29,6 @@ module icache(
     reg [`BLOCKNUM] valid;
     reg [31:0] val[`BLOCKNUM];
     reg [`ICTAG] tag[`BLOCKNUM];
-    reg is_new_from_mem;
 
     wire [31:0] pc = IF_addr;
     wire [7:0] index = pc[`ICINDEX];
@@ -36,35 +36,34 @@ module icache(
     wire [31:0] cur_ins = val[index];
 
     //ifetch向icache取指令没有命中，现在向mem传信号读入对应指令到cache
-    assign Mc_addr_sgn = miss && !MC_val_sgn ;
+    assign Mc_addr_sgn = miss && !MC_val_sgn && IF_addr_sgn;
     assign Mc_addr = pc;
+
 
     always @(posedge clk) begin
         if(rst) begin
             valid <= 0;
             IF_val_sgn <= `FALSE;
             IF_val <=0;
-            is_new_from_mem <= 0;
         end
         else if(!rdy || !IF_addr_sgn) begin
-            IF_val_sgn <=`FALSE;
-            is_new_from_mem <= 0;
+            IF_val_sgn <=`FALSE;        
         end
         else begin
-            if(!miss && !is_new_from_mem) begin
+            if(!miss && pc_change) begin
                 IF_val <= cur_ins;
                 IF_val_sgn <= `TRUE;
             end 
             else begin
                 IF_val <= MC_val;
                 IF_val_sgn <= MC_val_sgn;
-                is_new_from_mem <= 1;
             end
             if(MC_val_sgn)begin
                 valid[index] <= `TRUE;
                 val[index] <= MC_val;
-                tag[index] <= pc[`ICTAG];
+                tag[index] <= pc[`ICTAG];                
             end
+
         end
     end
     

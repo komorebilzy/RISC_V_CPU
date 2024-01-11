@@ -26,6 +26,7 @@ module memory_control(
     input wire [31:0] load_addr,
     input wire [5:0] load_op,
     input wire load_sgn,
+    output wire begin_real_load,
     output reg finish_load,
     output reg [31:0] load_data,
 
@@ -37,7 +38,7 @@ module memory_control(
 );
 
 reg [2:0] ins_offset;  
-reg [1:0] store_offset;
+reg [2:0] store_offset;
 reg [2:0] load_offset;
 reg [31:0] addr_record;
 
@@ -47,6 +48,7 @@ reg is_loading;
 reg is_fetching;
 
 assign begin_real_store= is_storing;
+assign begin_real_load=is_loading;
 
 always @(posedge clk) begin
     if(rst || rollback)begin
@@ -80,9 +82,9 @@ always @(posedge clk) begin
                 is_idle<=  `FALSE;
                 addr_record <= store_addr_in;
                 case(store_op)
-                    `SB: begin   store_offset<= 2'b01;   end
-                    `SH: begin   store_offset<= 2'b10;   end
-                    `SW: begin   store_offset<= 2'b11;   end
+                    `SB: begin   store_offset<= 3'b001;   end
+                    `SH: begin   store_offset<= 3'b010;   end
+                    `SW: begin   store_offset<= 3'b100;   end
                 endcase
             end
             else if(load_sgn)begin
@@ -92,9 +94,11 @@ always @(posedge clk) begin
                 mem_addr <= load_addr;
                 mem_rw <= 0;
                 case(load_op)
-                    `LB || `LBU: begin   load_offset<= 1;   end
-                    `LH || `LHU: begin   load_offset<= 2;   end
-                    `LW: begin   load_offset<= 4;   end
+                    `LB : begin   load_offset<= 3'b001;   end
+                    `LBU: begin   load_offset<= 3'b001;   end
+                    `LH: begin   load_offset<= 3'b010;   end
+                    `LHU: begin   load_offset<= 3'b010;   end
+                    `LW: begin   load_offset<= 3'b100;   end
                 endcase        
             end
             else if(pc_miss_sgn)begin
@@ -109,11 +113,11 @@ always @(posedge clk) begin
             if(is_storing)begin
                 mem_rw <= 1;  //big bug:应该在此处修改mem_rw状态而不是在前面的store_sgn，否则会把正在读取的地址的数据修改掉
                 if(store_op==`SW)begin
-                    if(store_offset==2'b11) mem_dout <= store_data_in[7:0];
-                    else if(store_offset==2'b10) mem_dout <= store_data_in[15:8];
-                    else if(store_offset==2'b01) mem_dout <= store_data_in[23:16];
+                    if(store_offset==4) mem_dout <= store_data_in[7:0];
+                    else if(store_offset==3) mem_dout <= store_data_in[15:8];
+                    else if(store_offset==2) mem_dout <= store_data_in[23:16];
+                    else if(store_offset==1) mem_dout <= store_data_in[31:24];
                     else begin
-                        mem_dout <= store_data_in[31:24];
                         is_storing <= `FALSE;
                         finish_store <=  `TRUE;
                         is_idle <= `TRUE;
@@ -123,9 +127,10 @@ always @(posedge clk) begin
                     addr_record <= addr_record + 1;
                 end
                 else if(store_op==`SH)begin
-                    if(store_offset==2'b10) mem_dout <= store_data_in[7:0];
+                    // $display("offset ",store_offset," data ",store_data_in[7:0]," ",store_data_in[15:8],"addr ",addr_record);
+                    if(store_offset==2) mem_dout <= store_data_in[7:0];
+                    else if(store_offset==1) mem_dout <= store_data_in[15:8];
                     else begin
-                        mem_dout <= store_data_in[15:8];
                         is_storing <= `FALSE;
                         finish_store <=  `TRUE;
                         is_idle <= `TRUE;
@@ -135,10 +140,18 @@ always @(posedge clk) begin
                     addr_record <= addr_record + 1;
                 end
                 else if(store_op==`SB)begin
-                    mem_dout <= store_data_in[7:0];
-                    is_storing <= `FALSE;
-                    finish_store <=  `TRUE;
-                    is_idle <= `TRUE;
+                    // $display("wwww",store_data_in);
+                    if(store_offset==1) begin
+                        // $display("real store",store_data_in[7:0]," mem_dout ",mem_dout);
+                        mem_dout <= store_data_in[7:0];
+                    end
+                    else begin
+                        // $display("no use store",store_data_in[7:0]," mem_dout ",mem_dout);
+                        is_storing <= `FALSE;
+                        finish_store <=  `TRUE;
+                        is_idle <= `TRUE;
+                    end
+                    store_offset <= store_offset - 1 ;
                     mem_addr <= addr_record;
                 end
             end
@@ -170,12 +183,17 @@ always @(posedge clk) begin
                     mem_addr <= mem_addr + 1;
                 end
                 else if(load_op==`LB || load_op== `LBU)begin
-                    load_data[7:0] <= mem_din;
-                    if(load_op==`LB) load_data[31:8]={24{load_data[7]}};
-                    is_loading <= `FALSE;
-                    finish_load <=  `TRUE;
-                    is_idle <= `TRUE;
-                    mem_addr <= mem_addr + 1;
+                        // $display("mem_addr is ",mem_din);
+
+                    if(load_offset==0)begin
+                        load_data[7:0] <= mem_din;
+                        if(load_op==`LB) load_data[31:8]={24{load_data[7]}};
+                        is_loading <= `FALSE;
+                        finish_load <=  `TRUE;
+                        is_idle <= `TRUE;
+                    end
+                    else load_offset <= load_offset - 1;
+                        
                 end
             end
             else if(is_fetching)begin

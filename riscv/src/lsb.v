@@ -56,6 +56,7 @@ module lsb(
     // output reg        load_or_store,
     output reg [5:0]  load_store_op,
     output reg [31:0] load_store_addr,
+    input wire begin_real_load,
     // output reg [31:0] load_store_data
 
     //from mem,只有当前面的store操作都执行完才能进行下一步的load操作
@@ -85,6 +86,7 @@ module lsb(
 
     integer i;
     always @(posedge clk)begin
+        // if(rollback) $display("rollback ",next_tail);
         if(rst || rollback)begin
             for(i = 0; i < LSB_SIZE; i = i + 1)begin
                 op[i] <= 0;
@@ -115,6 +117,11 @@ module lsb(
         else begin
             //issue
             if(get_instruction && is_load_store)begin
+            // $display(next_tail);
+
+                // $display(pc_now_in," ",next_tail);
+                // if(next_tail==8) $display(op_in);
+                // if(op_in==5 && entry_in==2) 
                 //  $display("new ins of lsb",next_tail);
                 //     $display(" the entry_rob",entry_in);
                 //     $display(" the op",op_in);
@@ -123,7 +130,6 @@ module lsb(
                 op[next_tail] <= op_in;
                 entry[next_tail] <= entry_in;
                 imm[next_tail] <= imm_in;
-
                 Qj[next_tail] <= Qj_in;
                 Vj[next_tail] <= Vj_in;
                 Qk[next_tail] <= Qk_in;
@@ -141,6 +147,7 @@ module lsb(
                             Vj[i] <= alu_result;
                         end
                         else if(Qk[i]==alu_entry)begin
+                            if(i==9) $display("alu ",alu_result," ",alu_entry);
                             Qk[i] <= `ENTRY_NULL;
                             Vk[i] <= alu_result;
                         end
@@ -156,6 +163,7 @@ module lsb(
                             Vj[i] <= load_result;
                         end
                         else if(Qk[i]==load_entry_out)begin
+                            // if(i==10) $display("lsb_load");
                             Qk[i] <= `ENTRY_NULL;
                             Vk[i] <= load_result;
                         end
@@ -172,13 +180,14 @@ module lsb(
                             Vj[i] <= rob_result;
                         end
                         else if(Qk[i]==rob_entry)begin
+                            // if(i==10) $display("rob_commit");
                             Qk[i] <= `ENTRY_NULL;
                             Vk[i] <= rob_result;
                         end
                     end
                 end
             end
-
+            
             case(state[next_head])
             `WAITING: begin
                 if(Qj[next_head] == `ENTRY_NULL && Qk[next_head] == `ENTRY_NULL)begin
@@ -189,6 +198,7 @@ module lsb(
                         load_store_addr <= Vj[next_head] + imm[next_head];
                     end
                     else begin
+                        // if(next_head==8) $display("entry[next_head] ",entry[next_head]);
                         state[next_head] <= `IS_STORING;
                         //it is to rob
                         lsb_store_broadcast <= `TRUE;
@@ -201,8 +211,10 @@ module lsb(
             end
 
             `LOAD_FINISHED: begin
-                if(mem_valid) begin
+                if(begin_real_load)
                     load_store_sgn <= `FALSE;
+                if(mem_valid) begin
+                    // $display(entry[next_head], " mem_result ",mem_res);
                     lsb_load_broadcast <= `TRUE;
                     load_entry_out <= entry[next_head];
                     load_result <= mem_res;
@@ -212,7 +224,7 @@ module lsb(
             end
 
             `IS_STORING :begin
-                if(finish_store)begin
+                if(finish_store)begin                    
                     lsb_store_broadcast <= `FALSE;
                     state[next_head] <= `EMPTY;
                     head <= next_head;

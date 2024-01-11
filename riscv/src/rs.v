@@ -151,8 +151,8 @@ module rs(
 
             if (cur_rs_ready != `ENTRY_NULL)begin // find waiting
                 calculate_sgn   <= `TRUE;
-                // if(op[cur_rs_ready]==36) begin
-                //     $display("wwww",Vj[cur_rs_ready]," ",imm[cur_rs_ready]);
+                // if(op[cur_rs_ready]==30) begin
+                //     $display("wwww Vj",Vj[cur_rs_ready],"Vk "," ",Vk[cur_rs_ready],"imm ",imm[cur_rs_ready]);
                 // end
                 op_out   <= op       [cur_rs_ready];
                 Vj_out   <= Vj       [cur_rs_ready];

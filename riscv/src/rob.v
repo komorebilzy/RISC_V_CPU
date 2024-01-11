@@ -8,6 +8,7 @@ module rob(
 
     //issue
     input wire get_instruction,
+    input wire [31:0]get_ins,
     input wire [5:0]op_in,
     input wire [5:0]rd_in,
     input wire [31:0]pc_pred,
@@ -57,6 +58,7 @@ module rob(
 );
     parameter ROB_SIZE = 32; 
     reg ready [ROB_SIZE-1:0];
+    reg [31:0] ins[ROB_SIZE-1:0];
     reg [`ROBENTRY] entry [ROB_SIZE-1:0];
     reg [31:0] value [ROB_SIZE-1:0];
     reg [31:0] addr [ROB_SIZE-1:0];
@@ -83,6 +85,7 @@ module rob(
         if(rst || rollback) begin
             for(i=0; i < ROB_SIZE; i=i+1) begin
                 ready[i] <= 0;
+                ins[i]<=0;
                 entry[i] <= `ENTRY_NULL;
                 value[i] <= 0;
                 addr[i] <= 0;
@@ -115,6 +118,7 @@ module rob(
         else begin
             if(get_instruction)begin
                 ready[next_tail] <= `FALSE;
+                ins[next_tail] <= get_ins;
                 entry[next_tail] <= next_tail;
                 op[next_tail] <= op_in;
                 rd[next_tail] <= rd_in;
@@ -123,6 +127,7 @@ module rob(
             end
 
             if(!empty && ready[next_head] && !is_storing)begin
+                // $display("next_head ",next_head," ",pc_init[next_head]," ",ins[next_head]," entry ",entry[next_head]," op ",op[next_head]," value ",value[next_head]);
                 //here predictor
                 if(op[next_head] == `JALR)begin
                     is_jalr <= `TRUE;
@@ -138,7 +143,7 @@ module rob(
                 else begin
                     update <= `FALSE;
                     if(op[next_head]>=`BEQ && op[next_head]<=`BGEU)begin
-                        // $display("branching!!!!!!");
+                        // $display("branch but jump write");
                         is_branch_ins <= `TRUE;
                     end
                     else 
@@ -193,6 +198,8 @@ module rob(
                         ready[i] <= `TRUE;
                         addr[i] <= store_addr;
                         value[i] <= store_result;
+                        // if(i==5) $display("data ",store_result[7:0]);
+
                         // pc_real[i] <= lsb_pc_out;
                         // $display(" lsb_store_broadcast",i," ",lsb_pc_out);
                     end
@@ -206,7 +213,6 @@ module rob(
                         value[i] <= rs_result;
                         pc_real[i] <= rs_pc_out;
                         pc_init[i] <= rs_pc_init;
-                        // $display(" rs_broadcast",rs_pc_out);
                     end
                 end
             end
