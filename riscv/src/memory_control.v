@@ -73,6 +73,7 @@ always @(posedge clk) begin
         //pause
     end
     else begin
+        // if(mem_addr==131068) $display("store? ",is_storing," store_data ",store_data_in," store_op ",store_op, " store_offset ",store_offset," load? ",is_loading," load_data ",load_data," load_offset ",load_offset," ,", $realtime);
         if (is_idle)begin
             finish_ins <=  `FALSE;
             finish_store <= `FALSE;
@@ -118,6 +119,7 @@ always @(posedge clk) begin
                     else if(store_offset==2) mem_dout <= store_data_in[23:16];
                     else if(store_offset==1) mem_dout <= store_data_in[31:24];
                     else begin
+                        mem_rw <= 0;
                         is_storing <= `FALSE;
                         finish_store <=  `TRUE;
                         is_idle <= `TRUE;
@@ -131,6 +133,7 @@ always @(posedge clk) begin
                     if(store_offset==2) mem_dout <= store_data_in[7:0];
                     else if(store_offset==1) mem_dout <= store_data_in[15:8];
                     else begin
+                        mem_rw <= 0;
                         is_storing <= `FALSE;
                         finish_store <=  `TRUE;
                         is_idle <= `TRUE;
@@ -147,6 +150,7 @@ always @(posedge clk) begin
                     end
                     else begin
                         // $display("no use store",store_data_in[7:0]," mem_dout ",mem_dout);
+                        mem_rw <= 0;
                         is_storing <= `FALSE;
                         finish_store <=  `TRUE;
                         is_idle <= `TRUE;
@@ -157,7 +161,9 @@ always @(posedge clk) begin
             end
 
             else if(is_loading)begin
+                // if(mem_addr==131067) $display("load_op ",load_op," value ",mem_din);
                 if(load_op==`LW)begin
+                    // $display("mem_addr is ",mem_addr," offset ",load_offset, " value ",mem_din);
                     if(load_offset==3) load_data[7:0] <= mem_din;
                     else if(load_offset==2) load_data[15:8] <= mem_din;       
                     else if(load_offset==1)  load_data[23:16] <= mem_din;  
@@ -167,8 +173,11 @@ always @(posedge clk) begin
                         finish_load <=  `TRUE;
                         is_idle <= `TRUE;
                     end
-                    load_offset <= load_offset - 1 ;
-                    mem_addr <= mem_addr + 1;
+                    if(load_offset>0)begin
+                        load_offset <= load_offset - 1 ;
+                        mem_addr <= mem_addr + 1;
+                    end
+               
                 end
                 else if(load_op==`LH || load_op== `LHU)begin
                     if(load_offset==1)  load_data[7:0] <= mem_din;
@@ -179,12 +188,13 @@ always @(posedge clk) begin
                         finish_load <=  `TRUE;
                         is_idle <= `TRUE;
                     end
-                    load_offset <= load_offset - 1 ;
-                    mem_addr <= mem_addr + 1;
+                     if(load_offset>0)begin
+                        load_offset <= load_offset - 1 ;
+                        mem_addr <= mem_addr + 1;
+                    end
                 end
                 else if(load_op==`LB || load_op== `LBU)begin
                         // $display("mem_addr is ",mem_din);
-
                     if(load_offset==0)begin
                         load_data[7:0] <= mem_din;
                         if(load_op==`LB) load_data[31:8]={24{load_data[7]}};
@@ -193,7 +203,6 @@ always @(posedge clk) begin
                         is_idle <= `TRUE;
                     end
                     else load_offset <= load_offset - 1;
-                        
                 end
             end
             else if(is_fetching)begin

@@ -39,7 +39,6 @@ module icache(
     assign Mc_addr_sgn = miss && !MC_val_sgn && IF_addr_sgn;
     assign Mc_addr = pc;
 
-
     always @(posedge clk) begin
         if(rst) begin
             valid <= 0;
@@ -51,6 +50,7 @@ module icache(
         end
         else begin
             if(!miss && pc_change) begin
+                // if(Mc_addr==4564) $display("hit!!");
                 IF_val <= cur_ins;
                 IF_val_sgn <= `TRUE;
             end 

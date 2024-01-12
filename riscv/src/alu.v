@@ -120,13 +120,13 @@ module alu(
                 end
                 `JALR  : begin
                     result = pc + 4;
+                    // $display("pc ",pc," lhs ",lhs," imm ",imm);
                     CDB_pc = (lhs + imm) & ~(32'b1); 
                 end
                 default:begin
                     result = 0;
                     CDB_pc = 0;
                 end 
-
             endcase
             // if(ROB_entry==10) begin
             //     $display("lhs ",lhs,"rhs ",imm,"result ",result);

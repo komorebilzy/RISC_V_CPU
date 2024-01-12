@@ -117,7 +117,7 @@ module lsb(
         else begin
             //issue
             if(get_instruction && is_load_store)begin
-            // $display(next_tail);
+            $display(next_tail);
 
                 // $display(pc_now_in," ",next_tail);
                 // if(next_tail==8) $display(op_in);
@@ -147,7 +147,7 @@ module lsb(
                             Vj[i] <= alu_result;
                         end
                         else if(Qk[i]==alu_entry)begin
-                            if(i==9) $display("alu ",alu_result," ",alu_entry);
+                            // if(i==9) $display("alu ",alu_result," ",alu_entry);
                             Qk[i] <= `ENTRY_NULL;
                             Vk[i] <= alu_result;
                         end

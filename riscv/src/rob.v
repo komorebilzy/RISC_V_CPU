@@ -32,7 +32,6 @@ module rob(
     input wire [31:0] store_result,
     // input wire [31:0] lsb_pc_out,
 
-    
     //commit 
     //to mem
     output reg  rob_store_sgn,
@@ -75,8 +74,8 @@ module rob(
     assign next_head = (head + 1) % ROB_SIZE;
     assign next_tail = (tail + 1) % ROB_SIZE;
     assign empty = (head==tail);
-    assign full=(next_tail==head);
-    assign rob_full=full;
+    assign full = (next_tail==head);
+    assign rob_full = full;
     assign entry_out = next_tail;
 
     integer i;
@@ -113,7 +112,6 @@ module rob(
         end
 
         else if(!rdy)begin
-
         end
         else begin
             if(get_instruction)begin
@@ -135,6 +133,7 @@ module rob(
                 end
                 else is_jalr <= `FALSE;
                 if(op[next_head]>=`BEQ &&op[next_head]<=`BGEU && pc_real[next_head] != pc_predict[next_head]) begin
+                    // $display("update ",op[next_head]," pc_real ",pc_real[next_head]," pc_pred ",pc_predict[next_head]);
                     is_branch_ins <= `TRUE;
                     update <= `TRUE;
                     pc_update <= pc_real[next_head];
@@ -143,7 +142,7 @@ module rob(
                 else begin
                     update <= `FALSE;
                     if(op[next_head]>=`BEQ && op[next_head]<=`BGEU)begin
-                        // $display("branch but jump write");
+                        // $display("no update ",op[next_head]," pc_real ",pc_real[next_head]," pc_pred ",pc_predict[next_head]);
                         is_branch_ins <= `TRUE;
                     end
                     else 
@@ -198,10 +197,6 @@ module rob(
                         ready[i] <= `TRUE;
                         addr[i] <= store_addr;
                         value[i] <= store_result;
-                        // if(i==5) $display("data ",store_result[7:0]);
-
-                        // pc_real[i] <= lsb_pc_out;
-                        // $display(" lsb_store_broadcast",i," ",lsb_pc_out);
                     end
                 end
             end

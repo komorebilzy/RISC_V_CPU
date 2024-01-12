@@ -23,7 +23,7 @@ module ifetch(
     input wire [5:0] entry_idle,
 
     //for ROB
-    output wire [31:0] pc_predict,
+    output reg [31:0] pc_predict,
     input wire update,
     input wire is_branch_ins,
     input wire is_jalr,
@@ -48,7 +48,7 @@ reg [31:0] pc_now;
 reg stop_fetching;
 
 assign rollback = update;
-assign pc_predict = pc_now;
+// assign pc_predict = pc_now;
 assign IC_addr = pc_now;
 assign IC_addr_sgn = !stop_fetching;
 assign entry_rob = entry_idle;
@@ -66,6 +66,17 @@ decoder u_decoder(
 
 assign issue_ins=IC_ins_sgn && !rollback;
 assign pc= pc_now;
+always @(*) begin
+    if(issue_ins&&pc==4564) $display("ins_i_got " ,IC_ins," ",$realtime);
+     if(predict_cnt[hash_idex_now]==`weaklyTaken || predict_cnt[hash_idex_now]==`stronglyTaken) begin
+        // $display("jump");
+         pc_predict = pc_now+imm;
+     end
+     else begin
+        // $display("not jump");
+        pc_predict = pc_now + 4;
+     end
+end
 
 integer i;
 always@(posedge clk)begin
@@ -81,7 +92,7 @@ always@(posedge clk)begin
         stop_fetching <= `TRUE;
         //pause
     end
-    else if(rollback)begin
+    else if(update)begin
         stop_fetching <= `FALSE;
         pc_change <= `TRUE;
         pc_now <= pc_update;
@@ -93,8 +104,8 @@ always@(posedge clk)begin
     else begin
         if(IC_ins_sgn)begin
             // $display(pc_now," ",);
-            // $display(pc_now," ",IC_ins," ",op);
-            if(op!= `JALR)pc_change <=  `TRUE;
+            // $display(pc_now," ",IC_ins," ",op," ",rd);
+            if(op!= `JALR) pc_change <=  `TRUE;
             if(op==`JAL) pc_now <= pc_now + imm;
             else if(op==`JALR) stop_fetching <= `TRUE;
             else if(op>=`BEQ && op<=`BGEU) begin
@@ -115,8 +126,8 @@ always@(posedge clk)begin
         end
 
         if(is_branch_ins)begin
-            if(update==`TRUE && predict_cnt[hash_idex_pc] != `stronglyTaken) predict_cnt[hash_idex_pc]<=predict_cnt[hash_idex_pc]+1;
-            else if(update==`FALSE && predict_cnt[hash_idex_pc] != `stronglyNotTaken) predict_cnt[hash_idex_pc]<=predict_cnt[hash_idex_pc]-1;
+            if(predict_cnt[hash_idex_pc] == `weaklyTaken) predict_cnt[hash_idex_pc]<=predict_cnt[hash_idex_pc] + 1;
+            else if(predict_cnt[hash_idex_pc] == `weaklyNotTaken) predict_cnt[hash_idex_pc]<=predict_cnt[hash_idex_pc] - 1;
         end
     end
 end

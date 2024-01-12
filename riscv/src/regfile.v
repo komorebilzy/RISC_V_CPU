@@ -34,10 +34,11 @@ module regfile(
     reg [`ROBENTRY] reorder[31:0];
     reg busy [31:0];
 
-    assign Qj = rs1 ==`NULL ? `ENTRY_NULL : (busy[rs1] ? reorder[rs1] : `ENTRY_NULL);
-    assign Qk = rs2 ==`NULL ? `ENTRY_NULL : (busy[rs2] ? reorder[rs2] : `ENTRY_NULL);
-    assign Vj = rs1 ==`NULL ? 32'b0 : (busy[rs1] ? 32'b0 : value[rs1]);
-    assign Vk = rs2 ==`NULL ? 32'b0 : (busy[rs2] ? 32'b0 : value[rs2]);
+    assign Qj = rs1 ==`NULL ? `ENTRY_NULL : (busy[rs1] ?((commit_sgn && reorder[rs1]==rob_entry) ? `ENTRY_NULL:reorder[rs1])  : `ENTRY_NULL);
+    assign Qk = rs2 ==`NULL ? `ENTRY_NULL : (busy[rs2] ? ((commit_sgn && reorder[rs2]==rob_entry) ? `ENTRY_NULL:reorder[rs2]) : `ENTRY_NULL);
+    assign Vj = rs1 ==`NULL ? 32'b0 : (busy[rs1] ?((commit_sgn && reorder[rs1]==rob_entry) ? value[rob_des]:32'b0) : value[rs1]);
+    assign Vk = rs2 ==`NULL ? 32'b0 : (busy[rs2] ? ((commit_sgn && reorder[rs2]==rob_entry) ? value[rob_des]:32'b0): value[rs2]);
+
 
     integer i;
     always @(posedge clk)begin
