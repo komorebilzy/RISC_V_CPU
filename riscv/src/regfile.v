@@ -36,8 +36,14 @@ module regfile(
 
     assign Qj = rs1 ==`NULL ? `ENTRY_NULL : (busy[rs1] ?((commit_sgn && reorder[rs1]==rob_entry) ? `ENTRY_NULL:reorder[rs1])  : `ENTRY_NULL);
     assign Qk = rs2 ==`NULL ? `ENTRY_NULL : (busy[rs2] ? ((commit_sgn && reorder[rs2]==rob_entry) ? `ENTRY_NULL:reorder[rs2]) : `ENTRY_NULL);
-    assign Vj = rs1 ==`NULL ? 32'b0 : (busy[rs1] ?((commit_sgn && reorder[rs1]==rob_entry) ? value[rob_des]:32'b0) : value[rs1]);
-    assign Vk = rs2 ==`NULL ? 32'b0 : (busy[rs2] ? ((commit_sgn && reorder[rs2]==rob_entry) ? value[rob_des]:32'b0): value[rs2]);
+    assign Vj = rs1 ==`NULL ? 32'b0 : (busy[rs1] ?((commit_sgn && reorder[rs1]==rob_entry) ? rob_result:32'b0) : value[rs1]);
+    assign Vk = rs2 ==`NULL ? 32'b0 : (busy[rs2] ? ((commit_sgn && reorder[rs2]==rob_entry) ? rob_result:32'b0): value[rs2]);
+
+    // always @(*)begin
+    //     if($realtime==3025)begin
+    //         $display("reorder[13] ",reorder[13]);
+    //     end
+    // end
 
     integer i;
     always @(posedge clk)begin

@@ -16,7 +16,6 @@ module icache(
     output wire Mc_addr_sgn, //true means really miss while false means no
 
     //Ifetch
-    input wire pc_change,
     input wire [31:0] IF_addr,
     input wire IF_addr_sgn,
     output reg [31:0] IF_val,
@@ -36,7 +35,7 @@ module icache(
     wire [31:0] cur_ins = val[index];
 
     //ifetch向icache取指令没有命中，现在向mem传信号读入对应指令到cache
-    assign Mc_addr_sgn = miss && !MC_val_sgn && IF_addr_sgn;
+    assign Mc_addr_sgn = miss && !MC_val_sgn;
     assign Mc_addr = pc;
 
     always @(posedge clk) begin
@@ -45,11 +44,11 @@ module icache(
             IF_val_sgn <= `FALSE;
             IF_val <=0;
         end
-        else if(!rdy || !IF_addr_sgn ||rollback) begin
+        else if(!rdy ||rollback) begin
             IF_val_sgn <=`FALSE;        
         end
         else begin
-            if(!miss && pc_change) begin
+            if(!miss && IF_addr_sgn) begin
                 // if(Mc_addr==4564) $display("hit!!");
                 IF_val <= cur_ins;
                 IF_val_sgn <= `TRUE;

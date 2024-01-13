@@ -70,6 +70,7 @@ wire [31:0] rob_pc_update;
 wire rob_is_jalr;
 wire [6:0] hash_idex_pc;
 wire rollback;
+wire [31:0] pc_to_rob;
 
 wire [5:0] issue_entry;
 wire  [31:0] issue_pc;
@@ -123,6 +124,10 @@ wire [31:0] alu_pc_out;
 wire [31:0] alu_pc_init_out;
 wire alu_broadcast;
 
+  `ifdef LZY
+  wire  [1023:0]  debugger;
+  `endif
+
 memory_control u_memory_control(
   .clk(clk_in),
   .rst(rst_in),
@@ -159,7 +164,6 @@ icache u_icache(
   .MC_val_sgn(icache_finish_ins),
   .Mc_addr(icache_pc_in),
   .Mc_addr_sgn(icache_pc_miss),
-  .pc_change(pc_change),
   .IF_addr(IF_addr),
   .IF_addr_sgn(IF_addr_sgn),
   .IF_val(IF_val),
@@ -174,11 +178,11 @@ ifetch u_ifetch(
   .lsb_full(lsb_full),
   .IC_ins_sgn(IF_val_sgn),
   .IC_ins(IF_val),
-  .pc_change(pc_change),
   .IC_addr(IF_addr),
   .IC_addr_sgn(IF_addr_sgn),
   .entry_idle(rob_entry_idle),
   .pc_predict(rob_pc_predict),
+  .pc_to_rob(pc_to_rob),
   .update(rob_update),
   .is_branch_ins(rob_is_branch_ins),
   .pc_update(rob_pc_update),
@@ -187,11 +191,11 @@ ifetch u_ifetch(
   .rollback(rollback),
   .entry_rob(issue_entry),
   .pc(issue_pc),
-  .rd(issue_rd),
-  .rs1(issue_rs1),
-  .rs2(issue_rs2),
-  .imm(issue_imm),
-  .op(issue_op),
+  .issue_rd(issue_rd),
+  .issue_rs1(issue_rs1),
+  .issue_rs2(issue_rs2),
+  .issue_imm(issue_imm),
+  .issue_op(issue_op),
   .issue_ins(issue_ins),
   .is_load_store(issue_is_load_store)
 );
@@ -326,7 +330,7 @@ rob u_rob(
   .rst(rst_in),
   .rdy(rdy_in),
   .get_instruction(issue_ins),
-  .get_ins(IF_val),
+  .get_ins(pc_to_rob),
   .op_in(issue_op),
   .rd_in(issue_rd),
   .pc_pred(rob_pc_predict),
