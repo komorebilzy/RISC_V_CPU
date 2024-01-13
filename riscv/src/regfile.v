@@ -13,7 +13,7 @@ module regfile(
         input wire [5:0] rs1,
         input wire [5:0] rs2,
 
-        //from rob
+        //ifetch
         input wire [`ROBENTRY] rob_new_entry,
         input wire issue_sgn,
 
@@ -39,15 +39,8 @@ module regfile(
     assign Vj = rs1 ==`NULL ? 32'b0 : (busy[rs1] ?((commit_sgn && reorder[rs1]==rob_entry) ? value[rob_des]:32'b0) : value[rs1]);
     assign Vk = rs2 ==`NULL ? 32'b0 : (busy[rs2] ? ((commit_sgn && reorder[rs2]==rob_entry) ? value[rob_des]:32'b0): value[rs2]);
 
-
     integer i;
     always @(posedge clk)begin
-        // if(rs2==14)begin
-        //     $display("value[14]",value[14]);
-        // end
-        // if(rob_des==13)begin
-        //     $display("rd==13 and value[13]",rob_result);
-        // end
         //清空
         if(rst)begin 
             for(i=0;i<32;i=i+1)begin
@@ -71,6 +64,8 @@ module regfile(
             //issue 阶段
             if(issue_sgn && rd!=`NULL && rd!=0)begin
                 busy[rd] <= `TRUE;
+                // if(rd==13 && rob_new_entry==7) $display("7 ",$realtime);
+                // if(rs1==13 && rob_new_entry==8) $display("8 ",$realtime);
                 reorder[rd] <= rob_new_entry;
             end
 
@@ -87,7 +82,5 @@ module regfile(
             end
         end
     end
-
-
 endmodule
 `endif

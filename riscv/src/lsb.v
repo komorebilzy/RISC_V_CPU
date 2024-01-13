@@ -117,8 +117,7 @@ module lsb(
         else begin
             //issue
             if(get_instruction && is_load_store)begin
-            $display(next_tail);
-
+                // $display(next_tail);
                 // $display(pc_now_in," ",next_tail);
                 // if(next_tail==8) $display(op_in);
                 // if(op_in==5 && entry_in==2) 

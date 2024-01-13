@@ -134,6 +134,7 @@ always @(*) begin
         end
     endcase
 
+    // if(op==34) $display("rs1 ",rs1," rs2 ",rs2);
 
 end
 

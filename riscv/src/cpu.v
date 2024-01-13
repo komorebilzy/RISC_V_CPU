@@ -170,6 +170,8 @@ ifetch u_ifetch(
   .clk(clk_in),
   .rst(rst_in),
   .rdy(rdy_in),
+  .rob_full(rob_full),
+  .lsb_full(lsb_full),
   .IC_ins_sgn(IF_val_sgn),
   .IC_ins(IF_val),
   .pc_change(pc_change),

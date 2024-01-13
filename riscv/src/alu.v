@@ -46,7 +46,10 @@ module alu(
                 `ANDI  : result = lhs & imm;
 
                 `SLL   : result = lhs << rhs[4:0];
-                `SLLI  : result = lhs << shamt;
+                `SLLI  : begin
+                    // $display("pc ",CDB_pc_init," lhs ",lhs," imm ",shamt);
+                    result = lhs << shamt;
+                end
                 `SRL   : result = lhs >>> rhs[4:0];
                 `SRLI  : result = lhs >>> shamt;
                 `SRA   : result = lhs >> rhs[4:0];

@@ -12,6 +12,8 @@ module ifetch(
     input wire clk,
     input wire rst,
     input wire rdy,
+    input wire rob_full,
+    input wire lsb_full,
 
     //from icache
     input wire IC_ins_sgn,
@@ -52,7 +54,7 @@ assign rollback = update;
 assign IC_addr = pc_now;
 assign IC_addr_sgn = !stop_fetching;
 assign entry_rob = entry_idle;
-wire hash_idex_now =pc_now[6:0];
+wire [6:0]hash_idex_now = pc_now[6:0] ;
 
 decoder u_decoder(
     .inst(IC_ins),
@@ -67,10 +69,9 @@ decoder u_decoder(
 assign issue_ins=IC_ins_sgn && !rollback;
 assign pc= pc_now;
 always @(*) begin
-    if(issue_ins&&pc==4564) $display("ins_i_got " ,IC_ins," ",$realtime);
      if(predict_cnt[hash_idex_now]==`weaklyTaken || predict_cnt[hash_idex_now]==`stronglyTaken) begin
         // $display("jump");
-         pc_predict = pc_now+imm;
+         pc_predict = pc_now + imm;
      end
      else begin
         // $display("not jump");
@@ -88,7 +89,7 @@ always@(posedge clk)begin
         stop_fetching <= `FALSE;
         pc_change <= `FALSE;
     end
-    else if(!rdy)begin
+    else if(!rdy || rob_full || lsb_full )begin
         stop_fetching <= `TRUE;
         //pause
     end
@@ -96,13 +97,13 @@ always@(posedge clk)begin
         stop_fetching <= `FALSE;
         pc_change <= `TRUE;
         pc_now <= pc_update;
-        // if(pc_now==4148) $display("4148 jump ");
         if(predict_cnt[hash_idex_pc] == `weaklyTaken|| predict_cnt[hash_idex_pc]==`stronglyTaken) predict_cnt[hash_idex_pc] <= predict_cnt[hash_idex_pc]-1;
         else predict_cnt[hash_idex_pc] <= predict_cnt[hash_idex_pc]+1;
     end
     
     else begin
         if(IC_ins_sgn)begin
+            // if(pc_now==4616) $display("pc ",pc_now," real_hash ",hash_idex_now);
             // $display(pc_now," ",);
             // $display(pc_now," ",IC_ins," ",op," ",rd);
             if(op!= `JALR) pc_change <=  `TRUE;

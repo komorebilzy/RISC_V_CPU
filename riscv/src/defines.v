@@ -55,7 +55,7 @@
 //U 
 `define LUI 6'd8
 `define AUIPC 6'd9
-//I
+//I and R
 `define SUB 6'd10
 `define ADD 6'd11
 `define ADDI 6'd12

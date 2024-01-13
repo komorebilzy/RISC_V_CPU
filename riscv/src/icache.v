@@ -45,7 +45,7 @@ module icache(
             IF_val_sgn <= `FALSE;
             IF_val <=0;
         end
-        else if(!rdy || !IF_addr_sgn) begin
+        else if(!rdy || !IF_addr_sgn ||rollback) begin
             IF_val_sgn <=`FALSE;        
         end
         else begin
