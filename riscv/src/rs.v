@@ -91,7 +91,6 @@ module rs(
             Vk_out <= 0;
             imm_out <= 0;
             pc_out <= 0;
-            // inst_out <= 0;
             entry_out <= `ENTRY_NULL;    
         end
         else if(!rdy) begin
@@ -151,15 +150,11 @@ module rs(
 
             if (cur_rs_ready != `ENTRY_NULL)begin // find waiting
                 calculate_sgn   <= `TRUE;
-                // if(op[cur_rs_ready]==30) begin
-                //     $display("wwww Vj",Vj[cur_rs_ready],"Vk "," ",Vk[cur_rs_ready],"imm ",imm[cur_rs_ready]);
-                // end
                 op_out   <= op       [cur_rs_ready];
                 Vj_out   <= Vj       [cur_rs_ready];
                 Vk_out   <= Vk       [cur_rs_ready];
                 imm_out  <= imm      [cur_rs_ready];
                 pc_out   <= rs_pc    [cur_rs_ready];
-                // inst_out <= inst     [cur_rs_ready];
                 entry_out <= entry   [cur_rs_ready];
                 state[cur_rs_ready] <= `EMPTY;
             end

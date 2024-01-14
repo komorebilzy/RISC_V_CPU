@@ -82,7 +82,6 @@ module lsb(
     assign empty = (head==tail);
     assign full=(head==next_tail);
     assign lsb_full=full;
-    // assign pc_out = pc_now_in + 4;
 
     integer i;
     always @(posedge clk)begin
@@ -120,13 +119,6 @@ module lsb(
             if(get_instruction && is_load_store)begin
                 // $display(next_tail);
                 // $display(pc_now_in," ",next_tail);
-                // if(next_tail==8) $display(op_in);
-                // if(op_in==5 && entry_in==2) 
-                //  $display("new ins of lsb",next_tail);
-                //     $display(" the entry_rob",entry_in);
-                //     $display(" the op",op_in);
-                //     $display(" the imm",imm_in);
-                //     $display(Vj_in,Vk_in);
                 op[next_tail] <= op_in;
                 entry[next_tail] <= entry_in;
                 imm[next_tail] <= imm_in;

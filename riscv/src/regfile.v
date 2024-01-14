@@ -34,16 +34,12 @@ module regfile(
     reg [`ROBENTRY] reorder[31:0];
     reg busy [31:0];
 
+    //commit的时候forwarding
     assign Qj = rs1 ==`NULL ? `ENTRY_NULL : (busy[rs1] ?((commit_sgn && reorder[rs1]==rob_entry) ? `ENTRY_NULL:reorder[rs1])  : `ENTRY_NULL);
     assign Qk = rs2 ==`NULL ? `ENTRY_NULL : (busy[rs2] ? ((commit_sgn && reorder[rs2]==rob_entry) ? `ENTRY_NULL:reorder[rs2]) : `ENTRY_NULL);
     assign Vj = rs1 ==`NULL ? 32'b0 : (busy[rs1] ?((commit_sgn && reorder[rs1]==rob_entry) ? rob_result:32'b0) : value[rs1]);
     assign Vk = rs2 ==`NULL ? 32'b0 : (busy[rs2] ? ((commit_sgn && reorder[rs2]==rob_entry) ? rob_result:32'b0): value[rs2]);
 
-    // always @(*)begin
-    //     if($realtime==3025)begin
-    //         $display("reorder[13] ",reorder[13]);
-    //     end
-    // end
 
     integer i;
     always @(posedge clk)begin
@@ -67,12 +63,9 @@ module regfile(
         end
 
         else begin
+            //debug:若有两条指令，一个commit一个issue且rd相同，我们应该选择新的issue,所以吧commit放前面
             //commit 阶段
-            //debug:若有两条指令，一个commit一个issue且rd相同，我们应该选择新的issue
             if(commit_sgn && rob_des!=`NULL && rob_des!=0) begin
-        //          if(rob_entry==1)begin
-        //     $display("value[1] commit",rob_result);
-        // end
                 value[rob_des] <= rob_result;
                 if(reorder[rob_des]==rob_entry)begin
                     busy[rob_des] <= `FALSE;
@@ -82,8 +75,6 @@ module regfile(
             //issue 阶段
             if(issue_sgn && rd!=`NULL && rd!=0)begin
                 busy[rd] <= `TRUE;
-                // if(rd==13 && rob_new_entry==7) $display("7 ",$realtime);
-                // if(rs1==13 && rob_new_entry==8) $display("8 ",$realtime);
                 reorder[rd] <= rob_new_entry;
             end
 

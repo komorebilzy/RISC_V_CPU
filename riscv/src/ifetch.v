@@ -49,10 +49,9 @@ reg [1:0] predict_cnt[127:0];
 reg [31:0] pc_now;
 
 assign rollback = update;
-// assign pc_predict = pc_now;
 assign IC_addr = pc_now;
 assign entry_rob = entry_idle;
-wire [6:0]hash_idex_now = pc_now[6:0] ;
+wire [6:0]hash_idex_now = pc_now[6:0];
 wire is_ls;
 wire [5:0] rs1,rs2,rd,op;
 wire [31:0] imm;
@@ -68,6 +67,7 @@ decoder u_decoder(
     .op(op)
 );
 
+//bug:when it is full,change both the IC_addr_sgn and tmp immediately
 always @(*)begin
     if(rob_full || lsb_full)begin
         IC_addr_sgn = `FALSE;
@@ -109,6 +109,7 @@ always@(posedge clk)begin
     end
     
     //tmp : a small trick to fix the problem of 连续发射，leaving it at least 2 clks before next issue
+    //过于密集的issue会导致一条指令Qj Qk读不到前一条指令的rd依赖
     else begin
         if(IC_ins_sgn)begin
             // $display(pc_now," ",IC_ins," ",$realtime);

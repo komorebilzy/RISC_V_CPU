@@ -126,10 +126,6 @@ module rob(
             end
 
             if(!empty && ready[next_head] && !is_storing)begin
-                // `ifdef LZY
-                //     $fdisplay(log, "entry",next_head," ",pc_init[next_head]," ",ins[next_head]," op ",op[next_head]," rd ",rd[next_head]," value ",value[next_head]," ",$realtime," ",rst);
-                // `endif
-                // $display(ins[next_head]);
                 // $display("entry ",next_head," ",pc_init[next_head]," ",ins[next_head]," op ",op[next_head]," rd ",rd[next_head]," value ",value[next_head]," ",$realtime);
                 //here predictor
                 if(op[next_head] == `JALR)begin
@@ -138,7 +134,6 @@ module rob(
                 end
                 else is_jalr <= `FALSE;
                 if(op[next_head]>=`BEQ &&op[next_head]<=`BGEU && pc_real[next_head] != pc_predict[next_head]) begin
-                    // $display("update ",op[next_head]," pc_real ",pc_real[next_head]," pc_pred ",pc_predict[next_head]);
                     is_branch_ins <= `TRUE;
                     update <= `TRUE;
                     pc_update <= pc_real[next_head];
@@ -174,6 +169,7 @@ module rob(
                     end
                 end
             end
+            //bug:与mem_cntrl有关
             else if(begin_real_store) rob_store_sgn <= `FALSE;
             else begin
                 commit_sgn <=  `FALSE;

@@ -28,15 +28,10 @@ module issue(
     //to rs lsb rob
     output wire is_ls,
     output wire is_rs,
-    // output wire [31:0] pc_now_in,
-    // output wire [`ROBENTRY] entry_out,
     output wire [31:0] Vj,
     output wire [31:0] Vk,
     output wire [`ROBENTRY] Qj,
     output wire [`ROBENTRY] Qk
-    // output wire [31:0] imm_out,
-    // output wire [5:0] op_out,
-    // output wire [5:0] rd_out,
 );
 
 assign rs1_to_reg=rs1;

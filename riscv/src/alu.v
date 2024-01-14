@@ -23,8 +23,8 @@ module alu(
     output wire CDB_sgn
 );
    
-    wire [4:0] shamt;
-    assign shamt = imm[4:0]; 
+    wire [4:0] shamt;            
+    assign shamt = imm[4:0];    //bug:此时的imm已经是处理好的imm，i型指令的imm！所以不是[24:20]，而是[4:0]
     assign CDB_sgn = RS_sgn;
     assign CDB_ROB_name = ROB_entry;
 
@@ -131,9 +131,6 @@ module alu(
                     CDB_pc = 0;
                 end 
             endcase
-            // if(ROB_entry==10) begin
-            //     $display("lhs ",lhs,"rhs ",imm,"result ",result);
-            // end
         end
     end
 

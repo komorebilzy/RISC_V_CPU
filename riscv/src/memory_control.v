@@ -47,6 +47,9 @@ reg is_storing;
 reg is_loading;
 reg is_fetching;
 
+//开始store或者load的时候向lsb或者rob传信号，让store_sgn和load_sgn变成低电位，
+//从而保证后面回到is_idle的时候不会重复store
+
 assign begin_real_store= is_storing;
 assign begin_real_load=is_loading;
 
@@ -73,7 +76,6 @@ always @(posedge clk) begin
         //pause
     end
     else begin
-        // if(mem_addr==131068) $display("store? ",is_storing," store_data ",store_data_in," store_op ",store_op, " store_offset ",store_offset," load? ",is_loading," load_data ",load_data," load_offset ",load_offset," ,", $realtime);
         if (is_idle)begin
             finish_ins <=  `FALSE;
             finish_store <= `FALSE;
@@ -109,6 +111,7 @@ always @(posedge clk) begin
                 mem_addr <= pc_in;
                 mem_rw <= 0;
             end 
+            //bug:不改的话 会出现mem_addr=0x3000,mem_rw=0向input读数据的错误，导致mem_din信号变红
             else mem_addr <= 0;
         end
         else begin
@@ -120,7 +123,7 @@ always @(posedge clk) begin
                     else if(store_offset==2) mem_dout <= store_data_in[23:16];
                     else if(store_offset==1) mem_dout <= store_data_in[31:24];
                     else begin
-                        mem_rw <= 0;
+                        mem_rw <= 0;    //与前面同理，store完立即修改，否则出错
                         is_storing <= `FALSE;
                         finish_store <=  `TRUE;
                         is_idle <= `TRUE;
@@ -130,7 +133,6 @@ always @(posedge clk) begin
                     addr_record <= addr_record + 1;
                 end
                 else if(store_op==`SH)begin
-                    // $display("offset ",store_offset," data ",store_data_in[7:0]," ",store_data_in[15:8],"addr ",addr_record);
                     if(store_offset==2) mem_dout <= store_data_in[7:0];
                     else if(store_offset==1) mem_dout <= store_data_in[15:8];
                     else begin
@@ -144,13 +146,10 @@ always @(posedge clk) begin
                     addr_record <= addr_record + 1;
                 end
                 else if(store_op==`SB)begin
-                    // $display("wwww",store_data_in);
                     if(store_offset==1) begin
-                        // $display("real store",store_data_in[7:0]," mem_dout ",mem_dout);
                         mem_dout <= store_data_in[7:0];
                     end
                     else begin
-                        // $display("no use store",store_data_in[7:0]," mem_dout ",mem_dout);
                         mem_rw <= 0;
                         is_storing <= `FALSE;
                         finish_store <=  `TRUE;
@@ -162,9 +161,8 @@ always @(posedge clk) begin
             end
 
             else if(is_loading)begin
-                // if(mem_addr==131067) $display("load_op ",load_op," value ",mem_din);
+                //第一个周期不可以接收mem_din，需要过一个周期才能得到正确的值
                 if(load_op==`LW)begin
-                    // $display("mem_addr is ",mem_addr," offset ",load_offset, " value ",mem_din);
                     if(load_offset==3) load_data[7:0] <= mem_din;
                     else if(load_offset==2) load_data[15:8] <= mem_din;       
                     else if(load_offset==1)  load_data[23:16] <= mem_din;  
@@ -195,7 +193,6 @@ always @(posedge clk) begin
                     end
                 end
                 else if(load_op==`LB || load_op== `LBU)begin
-                        // $display("mem_addr is ",mem_din);
                     if(load_offset==0)begin
                         load_data[7:0] <= mem_din;
                         if(load_op==`LB) load_data[31:8]={24{load_data[7]}};
