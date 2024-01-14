@@ -129,7 +129,7 @@ module rob(
                 // `ifdef LZY
                 //     $fdisplay(log, "entry",next_head," ",pc_init[next_head]," ",ins[next_head]," op ",op[next_head]," rd ",rd[next_head]," value ",value[next_head]," ",$realtime," ",rst);
                 // `endif
-                $display(ins[next_head]);
+                // $display(ins[next_head]);
                 // $display("entry ",next_head," ",pc_init[next_head]," ",ins[next_head]," op ",op[next_head]," rd ",rd[next_head]," value ",value[next_head]," ",$realtime);
                 //here predictor
                 if(op[next_head] == `JALR)begin
