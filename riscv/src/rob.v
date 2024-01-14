@@ -56,13 +56,6 @@ module rob(
     output reg [6:0] hash_idex_pc
 );
 
-`ifdef LZY
-integer log;
-initial begin
-    log = $fopen("ROB.txt", "w");
-end
-`endif
-
     parameter ROB_SIZE = 32; 
     reg ready [ROB_SIZE-1:0];
     reg [31:0] ins[ROB_SIZE-1:0];
@@ -136,7 +129,8 @@ end
                 // `ifdef LZY
                 //     $fdisplay(log, "entry",next_head," ",pc_init[next_head]," ",ins[next_head]," op ",op[next_head]," rd ",rd[next_head]," value ",value[next_head]," ",$realtime," ",rst);
                 // `endif
-                $display("entry ",next_head," ",pc_init[next_head]," ",ins[next_head]," op ",op[next_head]," rd ",rd[next_head]," value ",value[next_head]," ",$realtime);
+                $display(ins[next_head]);
+                // $display("entry ",next_head," ",pc_init[next_head]," ",ins[next_head]," op ",op[next_head]," rd ",rd[next_head]," value ",value[next_head]," ",$realtime);
                 //here predictor
                 if(op[next_head] == `JALR)begin
                     is_jalr <= `TRUE;

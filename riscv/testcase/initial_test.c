@@ -1,40 +1,38 @@
 #include "io.h"
-int a[4][11];
-int i;
-int j;
+//Target: use loops to calculate calculator of 6!
+//@author yixi
 
-struct rec {
-    int num;
-    int c;
-}b[5];
+int N;
+int h = 99;
+int i = 100;
+int j = 101;
+int k = 102;
+int total = 0;
 
-void printNum(int num) {
-    outlln(num);
-}
 int main() {
-
-
-    for (i = 0; i < 4; i ++) {
-        for (j = 0; j < 10; j ++)
-            a[i][j] = 888;
-    }
-    for (i = 0; i < 5; i ++) {
-        b[i].num = -1;
-    }
-
-    printNum(a[3][9]);
-    for (i = 0; i <= 3; i ++)
-        for (j = 0; j <= 9; j ++)
-            a[i][j] = i * 10 + j;
-
-    for (i = 0; i <= 3; i ++)
-        for (j = 0; j <= 9; j ++)
-            printNum(a[i][j]);
-    a[2][10]=0;
-    printNum(a[2][10]);
-    b[0].num = -2;
-    b[a[2][10]].num = -10;
-    printNum(b[0].num);
-    printNum(b[1].num);
-    return 0;
+  	int a;
+    int b;
+	int c;
+	int d;
+	int e;
+	int f;
+	N=6;
+	for ( a=1; a<=N; a++ )
+	for ( b=1; b<=N; b++ )
+	for ( c=1; c<=N; c++ )	
+	for ( d=1; d<=N; d++ )
+	for ( e=1; e<=N; e++ )
+	for ( f=1; f<=N; f++ )
+		if (a!=b && a!=c && a!=d && a!=e && a!=f && a!=h && a!=i && a!=j && a!=k
+              && b!=c && b!=d && b!=e && b!=f && b!=h && b!=i && b!=j && b!=k
+              && c!=d && c!=e && c!=f && c!=h && c!=i && c!=j && c!=k
+              && d!=e && d!=f && d!=h && d!=i && d!=j && d!=k
+              && e!=f && e!=h && e!=i && e!=j && e!=k
+              && f!=h && f!=i && f!=j && f!=k && i!=j && h!=k)
+		{
+			total++;
+		}
+	
+	outlln(total);
+	return 0;
 }

@@ -86,6 +86,7 @@ module lsb(
 
     integer i;
     always @(posedge clk)begin
+        if(lsb_full==1) $display("full");
         // if(rollback) $display("rollback ",next_tail);
         if(rst || rollback)begin
             for(i = 0; i < LSB_SIZE; i = i + 1)begin

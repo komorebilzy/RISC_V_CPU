@@ -68,6 +68,12 @@ decoder u_decoder(
     .op(op)
 );
 
+always @(*)begin
+    if(rob_full || lsb_full)begin
+        IC_addr_sgn = `FALSE;
+        tmp =1 ;
+    end
+end
 
 integer i;
 always@(posedge clk)begin
@@ -96,13 +102,16 @@ always@(posedge clk)begin
         IC_addr_sgn <= `TRUE;
         pc_now <= pc_update;
         issue_ins <= `FALSE;
+        tmp <= 0;
         
         if(predict_cnt[hash_idex_pc] == `weaklyTaken|| predict_cnt[hash_idex_pc]==`stronglyTaken) predict_cnt[hash_idex_pc] <= predict_cnt[hash_idex_pc]-1;
         else predict_cnt[hash_idex_pc] <= predict_cnt[hash_idex_pc]+1;
     end
     
+    //tmp : a small trick to fix the problem of 连续发射，leaving it at least 2 clks before next issue
     else begin
         if(IC_ins_sgn)begin
+            // $display(pc_now," ",IC_ins," ",$realtime);
             pc<=pc_now;
             issue_rd <= rd;
             issue_rs1 <= rs1;
@@ -129,7 +138,7 @@ always@(posedge clk)begin
                         pc_predict <= pc_now + 4;
                     end
                 end
-            else pc_now <= pc_now + 4;
+                else pc_now <= pc_now + 4;
             end   
         end
         else begin

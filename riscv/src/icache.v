@@ -31,7 +31,7 @@ module icache(
 
     wire [31:0] pc = IF_addr;
     wire [7:0] index = pc[`ICINDEX];
-    wire miss= !valid[index] || tag[index]!=pc[`ICTAG];
+    wire miss= !valid[index] || tag[index]!=pc[`ICTAG];   //debug:这里的index大小分法与define中不一样orz
     wire [31:0] cur_ins = val[index];
 
     //ifetch向icache取指令没有命中，现在向mem传信号读入对应指令到cache

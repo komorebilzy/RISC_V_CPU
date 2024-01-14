@@ -1,6 +1,6 @@
 `define BLOCKNUM 255:0   //ICACHE中BLOCK num
-`define ICINDEX 10:2   //inedx
-`define ICTAG 17:11    //tag
+`define ICINDEX 9:2   //inedx
+`define ICTAG 17:10   //tag
 `define INSTRLEN 31:0  //instruction
 `define ADDR 31:0      //地址的长度为32位
 `define DATALEN 31:0   //data 最长情况下的数据为32位

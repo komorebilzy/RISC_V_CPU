@@ -67,15 +67,8 @@ module regfile(
         end
 
         else begin
-            //issue 阶段
-            if(issue_sgn && rd!=`NULL && rd!=0)begin
-                busy[rd] <= `TRUE;
-                // if(rd==13 && rob_new_entry==7) $display("7 ",$realtime);
-                // if(rs1==13 && rob_new_entry==8) $display("8 ",$realtime);
-                reorder[rd] <= rob_new_entry;
-            end
-
             //commit 阶段
+            //debug:若有两条指令，一个commit一个issue且rd相同，我们应该选择新的issue
             if(commit_sgn && rob_des!=`NULL && rob_des!=0) begin
         //          if(rob_entry==1)begin
         //     $display("value[1] commit",rob_result);
@@ -86,6 +79,15 @@ module regfile(
                     reorder[rob_des] <= `ENTRY_NULL;
                 end
             end
+            //issue 阶段
+            if(issue_sgn && rd!=`NULL && rd!=0)begin
+                busy[rd] <= `TRUE;
+                // if(rd==13 && rob_new_entry==7) $display("7 ",$realtime);
+                // if(rs1==13 && rob_new_entry==8) $display("8 ",$realtime);
+                reorder[rd] <= rob_new_entry;
+            end
+
+            
         end
     end
 endmodule

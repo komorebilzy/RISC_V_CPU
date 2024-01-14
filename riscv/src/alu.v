@@ -60,7 +60,7 @@ module alu(
                 `SLTIU : result = lhs < rhs;
 
                 `LUI : result = imm;
-                `AUIPC : result = imm;
+                `AUIPC : result = pc + imm;
                 `BEQ   : begin
                     // $display("beq||| ",lhs ," ",rhs);
                     if(lhs == rhs)begin
@@ -123,8 +123,8 @@ module alu(
                 end
                 `JALR  : begin
                     result = pc + 4;
-                    // $display("pc ",pc," lhs ",lhs," imm ",imm);
                     CDB_pc = (lhs + imm) & ~(32'b1); 
+                    // $display("pc ",pc," lhs ",lhs," imm ",imm);
                 end
                 default:begin
                     result = 0;

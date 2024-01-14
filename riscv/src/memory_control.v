@@ -109,6 +109,7 @@ always @(posedge clk) begin
                 mem_addr <= pc_in;
                 mem_rw <= 0;
             end 
+            else mem_addr <= 0;
         end
         else begin
             if(is_storing)begin
