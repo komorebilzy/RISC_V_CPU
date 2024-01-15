@@ -101,6 +101,8 @@ wire rs_full;
 wire lsb_full;
 
 wire rob_full;
+wire full=rs_full || lsb_full || rob_full;
+
 wire lsb_load_broadcast;
 wire [`ROBENTRY] load_entry_out;
 wire [31:0] load_result;
@@ -160,6 +162,7 @@ icache u_icache(
   .rst(rst_in),
   .rdy(rdy_in),
   .rollback(rollback),
+  .full(full),
   .MC_val(icache_ins_out),
   .MC_val_sgn(icache_finish_ins),
   .Mc_addr(icache_pc_in),
@@ -174,8 +177,7 @@ ifetch u_ifetch(
   .clk(clk_in),
   .rst(rst_in),
   .rdy(rdy_in),
-  .rob_full(rob_full),
-  .lsb_full(lsb_full),
+  .full(full),
   .IC_ins_sgn(IF_val_sgn),
   .IC_ins(IF_val),
   .IC_addr(IF_addr),

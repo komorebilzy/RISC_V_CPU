@@ -7,6 +7,7 @@ module icache(
     input wire clk,
     input wire rst,
     input wire rdy,
+    input wire full,
     input wire rollback,
 
     //MemCtrl
@@ -35,7 +36,7 @@ module icache(
     wire [31:0] cur_ins = val[index];
 
     //ifetch向icache取指令没有命中，现在向mem传信号读入对应指令到cache
-    assign Mc_addr_sgn = miss && !MC_val_sgn;
+    assign Mc_addr_sgn = miss && !MC_val_sgn && !full;
     assign Mc_addr = pc;
 
     always @(posedge clk) begin

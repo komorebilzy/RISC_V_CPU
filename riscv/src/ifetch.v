@@ -12,8 +12,7 @@ module ifetch(
     input wire clk,
     input wire rst,
     input wire rdy,
-    input wire rob_full,
-    input wire lsb_full,
+    input wire full,
 
     //from icache
     input wire IC_ins_sgn,
@@ -68,12 +67,7 @@ decoder u_decoder(
 );
 
 //bug:when it is full,change both the IC_addr_sgn and tmp immediately
-always @(*)begin
-    if(rob_full || lsb_full)begin
-        IC_addr_sgn = `FALSE;
-        tmp =1 ;
-    end
-end
+
 
 integer i;
 always@(posedge clk)begin
@@ -94,8 +88,9 @@ always@(posedge clk)begin
         is_load_store <= 0;
         tmp <= 0;
     end
-    else if(!rdy || rob_full || lsb_full)begin
+    else if(!rdy || full)begin
         IC_addr_sgn <= `FALSE;
+        tmp <= 1;
         //pause
     end
     else if(update)begin
