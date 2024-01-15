@@ -134,6 +134,7 @@ memory_control u_memory_control(
   .clk(clk_in),
   .rst(rst_in),
   .rdy(rdy_in),
+  .io_buffer_full(io_buffer_full),
   .rollback(rollback),
   .pc_in(icache_pc_in),
   .pc_miss_sgn(icache_pc_miss),
