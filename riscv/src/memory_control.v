@@ -6,7 +6,6 @@ module memory_control(
     input wire clk,
     input wire rst,
     input wire rdy,
-    input wire io_buffer_full,
 
     input wire rollback,
     //from icache
@@ -81,7 +80,7 @@ always @(posedge clk) begin
             finish_ins <=  `FALSE;
             finish_store <= `FALSE;
             finish_load <= `FALSE;
-            if(store_sgn==`TRUE && (store_addr_in[17:16]!=2'b11 || !io_buffer_full))begin
+            if(store_sgn)begin
                 is_storing <= `TRUE;
                 is_idle<=  `FALSE;
                 addr_record <= store_addr_in;
@@ -90,9 +89,6 @@ always @(posedge clk) begin
                     `SH: begin   store_offset<= 3'b010;   end
                     `SW: begin   store_offset<= 3'b100;   end
                 endcase
-            end
-            else if(store_sgn==`TRUE && store_addr_in[17:16]==2'b11 && io_buffer_full)begin
-                //pause
             end
             else if(load_sgn)begin
                 is_loading <= `TRUE;

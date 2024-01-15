@@ -101,7 +101,7 @@ wire rs_full;
 wire lsb_full;
 
 wire rob_full;
-wire full=rs_full || lsb_full || rob_full;
+wire full= lsb_full || rob_full;
 
 wire lsb_load_broadcast;
 wire [`ROBENTRY] load_entry_out;
@@ -126,15 +126,12 @@ wire [31:0] alu_pc_out;
 wire [31:0] alu_pc_init_out;
 wire alu_broadcast;
 
-  `ifdef LZY
-  wire  [1023:0]  debugger;
-  `endif
+
 
 memory_control u_memory_control(
   .clk(clk_in),
   .rst(rst_in),
   .rdy(rdy_in),
-  .io_buffer_full(io_buffer_full),
   .rollback(rollback),
   .pc_in(icache_pc_in),
   .pc_miss_sgn(icache_pc_miss),
