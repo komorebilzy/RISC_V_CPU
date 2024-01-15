@@ -45,11 +45,11 @@ module icache(
             IF_val_sgn <= `FALSE;
             IF_val <=0;
         end
-        else if(!rdy ||rollback || full) begin
+        else if(!rdy ||rollback ) begin
             IF_val_sgn <=`FALSE;        
         end
         else begin
-            if(!miss && IF_addr_sgn) begin   //这里和ifetch思路理了好久。。
+            if(!miss && IF_addr_sgn && !full) begin   //这里和ifetch思路理了好久。。
                 IF_val <= cur_ins;
                 IF_val_sgn <= `TRUE;
             end 

@@ -68,7 +68,6 @@ decoder u_decoder(
 
 //bug:when it is full,change both the IC_addr_sgn and tmp immediately
 
-
 integer i;
 always@(posedge clk)begin
     if(rst)begin
