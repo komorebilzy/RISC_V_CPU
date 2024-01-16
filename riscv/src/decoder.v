@@ -4,7 +4,6 @@
 `define decoder
 module decoder(
     input wire [31:0] inst,
-
     output reg is_load_store,
     output reg [5:0] rd,
     output reg [5:0] rs1,
@@ -133,7 +132,6 @@ always @(*) begin
             op=`AUIPC;
         end
     endcase
-
 end
 
 endmodule

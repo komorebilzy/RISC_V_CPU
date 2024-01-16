@@ -186,7 +186,7 @@ always @(posedge clk) begin
                     if(load_offset==1)  load_data[7:0] <= mem_din;
                     else if(load_offset==0) begin
                         load_data[15:8] <= mem_din;
-                        if(load_op==`LH) load_data[31:16]={16{load_data[15]}};
+                        if(load_op==`LH) load_data[31:16] <={16{load_data[15]}};
                         is_loading <= `FALSE;
                         finish_load <=  `TRUE;
                         is_idle <= `TRUE;
@@ -199,7 +199,7 @@ always @(posedge clk) begin
                 else if(load_op==`LB || load_op== `LBU)begin
                     if(load_offset==0)begin
                         load_data[7:0] <= mem_din;
-                        if(load_op==`LB) load_data[31:8]={24{load_data[7]}};
+                        if(load_op==`LB) load_data[31:8] <={24{load_data[7]}};
                         is_loading <= `FALSE;
                         finish_load <=  `TRUE;
                         is_idle <= `TRUE;

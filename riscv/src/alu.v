@@ -29,7 +29,10 @@ module alu(
     assign CDB_ROB_name = ROB_entry;
 
     always @(*) begin
-        if(RS_sgn)begin
+        result = 0;
+        CDB_pc_init =0;
+        CDB_pc =0;
+        if(RS_sgn && !rst &&rdy)begin
             
             CDB_pc_init = pc;
             CDB_pc = pc + 4;
