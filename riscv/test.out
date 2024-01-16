@@ -1,0 +1,3 @@
+WARNING: /mnt/d/desktop/cpu/riscv/src/common/block_ram/block_ram.v:93: $readmemh: Standard inconsistency, following 1364-2005.
+0000
+1234IO:Return

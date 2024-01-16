@@ -113,7 +113,7 @@ wire [31:0] store_result;
 // wire [31:0] lsb_pc_out;
 
 //alu
-wire calculate;
+wire calculate_sgn;
 wire [5:0] alu_op_in;
 wire [31:0] alu_lhs_in;
 wire [31:0] alu_rhs_in;
