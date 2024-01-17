@@ -1,0 +1,830 @@
+WARNING: /mnt/d/desktop/cpu/riscv/src/common/block_ram/block_ram.v:93: $readmemh: Standard inconsistency, following 1364-2005.
+VCD info: dumpfile test.vcd opened for output.
+ 1 result     131072
+ 2 result          8
+ 2 result          8
+ 3 result     130992
+ 5 result          1
+ 5 result          1
+ 6 result       4096
+ 6 result       4096
+ 7 result       4768
+20 result          2
+20 result          2
+21 result       4768
+21 result       4768
+26 result          3
+26 result          3
+28 result          4
+28 result          4
+31 result       4784
+31 result       4784
+ 0 result     130996
+ 0 result     130996
+ 1 result          9
+ 1 result          9
+ 2 result         45
+ 2 result         45
+ 3 result     196608
+ 3 result     196608
+ 5 result          0
+ 6 result          0
+ 6 result          0
+ 7 result          0
+ 7 result          0
+ 8 result         10
+ 8 result         10
+ 9 result          0
+ 9 result          0
+10 result       4436
+10 result       4436
+11 result       4436
+11 result       4436
+12 result          0
+12 result          0
+13 result          0
+13 result          0
+14 result       4244
+15 result         10
+15 result         10
+16 result          0
+17 result 4294967295
+17 result 4294967295
+18 result          0
+18 result          0
+19 result          1
+19 result          1
+20 result          1
+20 result          1
+ 1 result          0
+ 2 result          1
+ 2 result          1
+ 1 result          1
+ 1 result          0
+ 2 result          5
+ 3 result          0
+ 3 result          0
+ 4 result       4176
+ 4 result       4176
+ 5 result          0
+ 6 result       4252
+ 7 result          0
+ 8 result          1
+ 8 result          1
+ 9 result         48
+ 9 result         48
+10 result     130997
+10 result     130997
+11 result          0
+13 result         10
+13 result         10
+14 result          0
+14 result          0
+15 result       4472
+15 result       4472
+16 result          0
+16 result          0
+17 result          0
+17 result          0
+18 result         10
+18 result         10
+19 result          0
+20 result 4294967295
+20 result 4294967295
+21 result          0
+21 result          0
+22 result          1
+22 result          1
+23 result          1
+23 result          1
+24 result          0
+24 result          0
+25 result          1
+25 result          1
+26 result          0
+26 result          0
+27 result          5
+28 result          0
+28 result          0
+29 result       4176
+29 result       4176
+30 result          0
+31 result          0
+31 result          0
+ 0 result          1
+ 0 result          1
+ 1 result     130996
+ 3 result     130996
+ 4 result     130995
+ 4 result     130995
+0 6 result          0
+ 6 result          0
+ 7 result       4772
+ 7 result       4772
+ 8 result          1
+ 8 result          1
+ 2 result          0
+ 3 result          0
+ 3 result          0
+ 4 result          0
+ 4 result          0
+ 5 result         10
+ 5 result         10
+ 6 result          0
+ 6 result          0
+ 7 result       4436
+ 7 result       4436
+ 8 result       4436
+ 8 result       4436
+ 9 result          0
+ 9 result          0
+10 result          0
+10 result          0
+11 result       4244
+12 result         10
+12 result         10
+13 result          0
+14 result 4294967295
+14 result 4294967295
+15 result          0
+15 result          0
+16 result          1
+16 result          1
+17 result          1
+17 result          1
+18 result          0
+18 result          0
+19 result          1
+19 result          1
+20 result          0
+20 result          0
+21 result          5
+22 result          0
+22 result          0
+23 result       4176
+23 result       4176
+24 result          0
+25 result       4252
+26 result          0
+27 result          1
+27 result          1
+28 result         48
+28 result         48
+29 result     130997
+29 result     130997
+30 result          0
+ 0 result         10
+ 0 result         10
+ 1 result          0
+ 1 result          0
+ 2 result       4472
+ 2 result       4472
+ 3 result          0
+ 3 result          0
+ 4 result          0
+ 4 result          0
+ 5 result         10
+ 5 result         10
+ 6 result          0
+ 7 result 4294967295
+ 7 result 4294967295
+ 8 result          0
+ 8 result          0
+ 9 result          1
+ 9 result          1
+10 result          1
+10 result          1
+11 result          0
+11 result          0
+12 result          1
+12 result          1
+13 result          0
+13 result          0
+14 result          5
+15 result          0
+15 result          0
+16 result       4176
+16 result       4176
+17 result          0
+18 result          0
+18 result          0
+19 result          1
+19 result          1
+ 1 result     130996
+ 3 result     130996
+ 4 result     130995
+ 4 result     130995
+ 6 result          0
+ 6 result          0
+0 7 result       4776
+ 7 result       4776
+ 8 result          1
+ 8 result          1
+10 result          0
+10 result          0
+11 result          0
+11 result          0
+12 result          0
+12 result          0
+13 result         10
+13 result         10
+14 result          0
+14 result          0
+15 result       4436
+15 result       4436
+16 result       4436
+16 result       4436
+17 result          0
+17 result          0
+18 result          0
+18 result          0
+19 result       4244
+20 result         10
+20 result         10
+21 result          0
+22 result 4294967295
+22 result 4294967295
+23 result          0
+23 result          0
+24 result          1
+24 result          1
+25 result          1
+25 result          1
+26 result          0
+26 result          0
+27 result          1
+27 result          1
+28 result          0
+28 result          0
+29 result          5
+30 result          0
+30 result          0
+31 result       4176
+31 result       4176
+ 0 result          0
+ 1 result       4252
+ 2 result          0
+ 3 result          1
+ 3 result          1
+ 4 result         48
+ 4 result         48
+ 5 result     130997
+ 5 result     130997
+ 6 result          0
+ 8 result         10
+ 8 result         10
+ 9 result          0
+ 9 result          0
+10 result       4472
+10 result       4472
+11 result          0
+11 result          0
+12 result          0
+12 result          0
+13 result         10
+13 result         10
+14 result          0
+15 result 4294967295
+15 result 4294967295
+16 result          0
+16 result          0
+17 result          1
+17 result          1
+18 result          1
+18 result          1
+19 result          0
+19 result          0
+20 result          1
+20 result          1
+21 result          0
+21 result          0
+22 result          5
+23 result          0
+23 result          0
+24 result       4176
+24 result       4176
+25 result          0
+26 result          0
+26 result          0
+27 result          1
+27 result          1
+ 1 result     130996
+ 3 result     130996
+ 4 result     130995
+ 4 result     130995
+ 6 result          0
+ 6 result          0
+0 7 result       4780
+ 7 result       4780
+ 8 result          1
+ 8 result          1
+10 result          0
+10 result          0
+11 result          0
+11 result          0
+12 result          0
+12 result          0
+13 result         10
+13 result         10
+14 result          0
+14 result          0
+15 result       4436
+15 result       4436
+16 result       4436
+16 result       4436
+17 result          0
+17 result          0
+18 result          0
+18 result          0
+19 result       4244
+20 result         10
+20 result         10
+21 result          0
+22 result 4294967295
+22 result 4294967295
+23 result          0
+23 result          0
+24 result          1
+24 result          1
+25 result          1
+25 result          1
+26 result          0
+26 result          0
+27 result          1
+27 result          1
+28 result          0
+28 result          0
+29 result          5
+30 result          0
+30 result          0
+31 result       4176
+31 result       4176
+ 0 result          0
+ 1 result       4252
+ 2 result          0
+ 3 result          1
+ 3 result          1
+ 4 result         48
+ 4 result         48
+ 5 result     130997
+ 5 result     130997
+ 6 result          0
+ 8 result         10
+ 8 result         10
+ 9 result          0
+ 9 result          0
+10 result       4472
+10 result       4472
+11 result          0
+11 result          0
+12 result          0
+12 result          0
+13 result         10
+13 result         10
+14 result          0
+15 result 4294967295
+15 result 4294967295
+16 result          0
+16 result          0
+17 result          1
+17 result          1
+18 result          1
+18 result          1
+19 result          0
+19 result          0
+20 result          1
+20 result          1
+21 result          0
+21 result          0
+22 result          5
+23 result          0
+23 result          0
+24 result       4176
+24 result       4176
+25 result          0
+26 result          0
+26 result          0
+27 result          1
+27 result          1
+ 1 result     130996
+ 3 result     130996
+ 4 result     130995
+ 4 result     130995
+ 6 result          0
+ 6 result          0
+0 7 result       4784
+ 7 result       4784
+ 8 result          0
+ 8 result          0
+ 1 result         10
+ 1 result         10
+
+ 3 result     131008
+ 3 result     131008
+ 4 result     131024
+ 4 result     131024
+ 5 result          9
+ 5 result          9
+ 6 result         45
+ 6 result         45
+ 7 result     196608
+ 7 result     196608
+ 9 result          0
+10 result          0
+10 result          0
+11 result          0
+11 result          0
+12 result         10
+12 result         10
+13 result          1
+13 result          1
+14 result       4588
+14 result       4588
+15 result       4588
+15 result       4588
+16 result          0
+16 result          0
+17 result          0
+17 result          0
+18 result       4244
+19 result         10
+19 result         10
+20 result          1
+21 result 4294967295
+21 result 4294967295
+22 result          0
+22 result          0
+23 result          1
+23 result          1
+24 result          1
+24 result          1
+25 result          0
+25 result          0
+26 result          1
+26 result          1
+27 result          0
+27 result          0
+28 result          5
+29 result          0
+29 result          0
+30 result       4176
+30 result       4176
+31 result          1
+ 0 result       4252
+ 1 result          0
+ 2 result          1
+ 2 result          1
+ 3 result         49
+ 3 result         49
+ 4 result     130997
+ 4 result     130997
+ 5 result          1
+ 7 result         10
+ 7 result         10
+ 8 result          1
+ 8 result          1
+ 9 result       4624
+ 9 result       4624
+10 result          0
+10 result          0
+11 result          0
+11 result          0
+12 result         10
+12 result         10
+13 result          1
+14 result 4294967295
+14 result 4294967295
+15 result          0
+15 result          0
+16 result          1
+16 result          1
+17 result          1
+17 result          1
+18 result          0
+18 result          0
+19 result          1
+19 result          1
+20 result          0
+20 result          0
+21 result          5
+22 result          0
+22 result          0
+23 result       4176
+23 result       4176
+24 result          0
+25 result          0
+25 result          0
+26 result          1
+26 result          1
+ 1 result     130996
+ 3 result     130996
+ 4 result     130995
+ 4 result     130995
+1 6 result          0
+ 6 result          0
+ 7 result     131012
+ 7 result     131012
+ 8 result          1
+ 8 result          1
+ 2 result          0
+ 3 result          0
+ 3 result          0
+ 4 result          0
+ 4 result          0
+ 5 result         10
+ 5 result         10
+ 6 result          2
+ 6 result          2
+ 7 result       4588
+ 7 result       4588
+ 8 result       4588
+ 8 result       4588
+ 9 result          0
+ 9 result          0
+10 result          0
+10 result          0
+11 result       4244
+12 result         10
+12 result         10
+13 result          2
+14 result 4294967295
+14 result 4294967295
+15 result          0
+15 result          0
+16 result          1
+16 result          1
+17 result          1
+17 result          1
+18 result          0
+18 result          0
+19 result          1
+19 result          1
+20 result          0
+20 result          0
+21 result          5
+22 result          0
+22 result          0
+ 1 result       4176
+ 2 result          2
+ 3 result       4252
+ 4 result          0
+ 5 result          1
+ 5 result          1
+ 6 result         50
+ 6 result         50
+ 7 result     130997
+ 7 result     130997
+ 8 result          2
+10 result         10
+10 result         10
+11 result          2
+11 result          2
+12 result       4624
+12 result       4624
+13 result          0
+13 result          0
+14 result          0
+14 result          0
+15 result         10
+15 result         10
+16 result          2
+17 result 4294967295
+17 result 4294967295
+18 result          0
+18 result          0
+19 result          1
+19 result          1
+20 result          1
+20 result          1
+21 result          0
+21 result          0
+22 result          1
+22 result          1
+23 result          0
+23 result          0
+24 result          5
+25 result          0
+25 result          0
+26 result       4176
+26 result       4176
+27 result          0
+28 result          0
+28 result          0
+29 result          1
+29 result          1
+30 result     130996
+30 result     130996
+ 0 result     130996
+ 1 result     130995
+ 1 result     130995
+ 3 result          0
+ 3 result          0
+2 4 result     131016
+ 4 result     131016
+ 5 result          1
+ 5 result          1
+ 2 result          0
+ 3 result          0
+ 3 result          0
+ 4 result          0
+ 4 result          0
+ 5 result         10
+ 5 result         10
+ 6 result          3
+ 6 result          3
+ 7 result       4588
+ 7 result       4588
+ 8 result       4588
+ 8 result       4588
+ 9 result          0
+ 9 result          0
+10 result          0
+10 result          0
+11 result       4244
+12 result         10
+12 result         10
+13 result          3
+14 result 4294967295
+14 result 4294967295
+15 result          0
+15 result          0
+16 result          1
+16 result          1
+17 result          1
+17 result          1
+18 result          0
+18 result          0
+19 result          1
+19 result          1
+20 result          0
+20 result          0
+21 result          5
+22 result          0
+22 result          0
+ 1 result       4176
+ 2 result          3
+ 3 result       4252
+ 4 result          0
+ 5 result          1
+ 5 result          1
+ 6 result         51
+ 6 result         51
+ 7 result     130997
+ 7 result     130997
+ 8 result          3
+10 result         10
+10 result         10
+11 result          3
+11 result          3
+12 result       4624
+12 result       4624
+13 result          0
+13 result          0
+14 result          0
+14 result          0
+15 result         10
+15 result         10
+16 result          3
+17 result 4294967295
+17 result 4294967295
+18 result          0
+18 result          0
+19 result          1
+19 result          1
+20 result          1
+20 result          1
+21 result          0
+21 result          0
+22 result          1
+22 result          1
+23 result          0
+23 result          0
+24 result          5
+25 result          0
+25 result          0
+26 result       4176
+26 result       4176
+27 result          0
+28 result          0
+28 result          0
+29 result          1
+29 result          1
+30 result     130996
+30 result     130996
+ 0 result     130996
+ 1 result     130995
+ 1 result     130995
+ 3 result          0
+ 3 result          0
+3 4 result     131020
+ 4 result     131020
+ 5 result          1
+ 5 result          1
+ 2 result          0
+ 3 result          0
+ 3 result          0
+ 4 result          0
+ 4 result          0
+ 5 result         10
+ 5 result         10
+ 6 result          4
+ 6 result          4
+ 7 result       4588
+ 7 result       4588
+ 8 result       4588
+ 8 result       4588
+ 9 result          0
+ 9 result          0
+10 result          0
+10 result          0
+11 result       4244
+12 result         10
+12 result         10
+13 result          4
+14 result 4294967295
+14 result 4294967295
+15 result          0
+15 result          0
+16 result          1
+16 result          1
+17 result          1
+17 result          1
+18 result          0
+18 result          0
+19 result          1
+19 result          1
+20 result          0
+20 result          0
+21 result          5
+22 result          0
+22 result          0
+ 1 result       4176
+ 2 result          4
+ 3 result       4252
+ 4 result          0
+ 5 result          1
+ 5 result          1
+ 6 result         52
+ 6 result         52
+ 7 result     130997
+ 7 result     130997
+ 8 result          4
+10 result         10
+10 result         10
+11 result          4
+11 result          4
+12 result       4624
+12 result       4624
+13 result          0
+13 result          0
+14 result          0
+14 result          0
+15 result         10
+15 result         10
+16 result          4
+17 result 4294967295
+17 result 4294967295
+18 result          0
+18 result          0
+19 result          1
+19 result          1
+20 result          1
+20 result          1
+21 result          0
+21 result          0
+22 result          1
+22 result          1
+23 result          0
+23 result          0
+24 result          5
+25 result          0
+25 result          0
+26 result       4176
+26 result       4176
+27 result          0
+28 result          0
+28 result          0
+29 result          1
+29 result          1
+30 result     130996
+30 result     130996
+ 0 result     130996
+ 1 result     130995
+ 1 result     130995
+ 3 result          0
+ 3 result          0
+4 4 result     131024
+ 4 result     131024
+ 5 result          0
+ 5 result          0
+18 result          0
+18 result          0
+19 result     131072
+19 result     131072
+20 result       4744
+20 result       4744
+21 result        255
+21 result        255
+22 result     196608
+22 result     196608
+IO:Return

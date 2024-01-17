@@ -77,8 +77,6 @@ module regfile(
                 busy[rd] <= `TRUE;
                 reorder[rd] <= rob_new_entry;
             end
-
-            
         end
     end
 endmodule

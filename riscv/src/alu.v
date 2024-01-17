@@ -134,6 +134,7 @@ module alu(
                     CDB_pc = 0;
                 end 
             endcase
+            $display(CDB_ROB_name," result ",result);
         end
     end
 
